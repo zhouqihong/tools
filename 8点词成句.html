@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点词成句 - 汉语学习游戏（带音效）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Marker Felt', '楷体', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #a8d8ff, #c2e9ff);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 标题样式 */
+        .header {
+            text-align: center;
+            margin: 20px 0 40px;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 4.5rem;
+            color: #333;
+            display: inline-block;
+            padding: 15px 60px;
+            background: linear-gradient(145deg, #ffcce0, #ffb6d9);
+            border-radius: 25px;
+            box-shadow: 
+                0 10px 20px rgba(255, 150, 200, 0.4),
+                inset 0 -5px 15px rgba(220, 100, 150, 0.3),
+                inset 0 5px 15px rgba(255, 200, 230, 0.8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            border: 3px solid #ffafcc;
+            transform: rotate(-2deg);
+            position: relative;
+            z-index: 10;
+            animation: jiggle 3s infinite;
+        }
+        
+        .title::after {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 2px dashed rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            pointer-events: none;
+        }
+        
+        @keyframes jiggle {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+        
+        /* 游戏区域容器 */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 40px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* 词语区域 */
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(100, 150, 255, 0.2);
+            min-height: 220px;
+        }
+        
+        /* 词语卡片样式 */
+        .word-card {
+            background: linear-gradient(145deg, #ffd6e8, #ffb6d9);
+            padding: 18px 35px;
+            border-radius: 20px;
+            font-size: 2.2rem;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 
+                0 8px 16px rgba(255, 150, 200, 0.4),
+                inset 0 -4px 10px rgba(220, 100, 150, 0.3),
+                inset 0 4px 10px rgba(255, 220, 240, 0.8);
+            border: 3px solid #ffafcc;
+            transition: all 0.3s ease;
+            animation: float 4s infinite ease-in-out;
+            position: relative;
+        }
+        
+        .word-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 12px 20px rgba(255, 150, 200, 0.5),
+                inset 0 -4px 10px rgba(220, 100, 150, 0.3),
+                inset 0 4px 10px rgba(255, 220, 240, 0.8);
+        }
+        
+        .word-card::after {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 2px dashed rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* 句子区域 */
+        .sentence-area {
+            min-height: 250px;
+            padding: 30px;
+            border: 6px dashed #ffafcc;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 
+                inset 0 0 20px rgba(255, 150, 200, 0.3),
+                0 10px 30px rgba(100, 150, 255, 0.2);
+            position: relative;
+        }
+        
+        .sentence-area::before {
+            content: "将词语拖拽到这里组成句子";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.2rem;
+            color: rgba(255, 150, 200, 0.6);
+            pointer-events: none;
+            text-align: center;
+            width: 100%;
+            display: none;
+        }
+        
+        .sentence-area.empty::before {
+            display: block;
+        }
+        
+        /* 控制按钮 */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.8rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: linear-gradient(145deg, #ffd6e8, #ffb6d9);
+            box-shadow: 
+                0 6px 12px rgba(255, 150, 200, 0.4),
+                inset 0 -3px 8px rgba(220, 100, 150, 0.3),
+                inset 0 3px 8px rgba(255, 220, 240, 0.8);
+            color: #333;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 3px solid #ffafcc;
+            position: relative;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 10px 18px rgba(255, 150, 200, 0.5),
+                inset 0 -3px 8px rgba(220, 100, 150, 0.3),
+                inset 0 3px 8px rgba(255, 220, 240, 0.8);
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+        }
+        
+        /* 结果弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            width: 80%;
+            max-width: 600px;
+            padding: 50px 30px;
+            border-radius: 30px;
+            text-align: center;
+            position: relative;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 -10px 20px rgba(0, 0, 0, 0.1),
+                inset 0 10px 20px rgba(255, 255, 255, 0.5);
+            transform: scale(0.8);
+            opacity: 0;
+            animation: popIn 0.5s forwards;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal-text {
+            font-size: 3rem;
+            margin-bottom: 40px;
+            color: #333;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .modal-btn {
+            padding: 18px 60px;
+            font-size: 2.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: linear-gradient(145deg, #ffd6e8, #ffb6d9);
+            box-shadow: 
+                0 8px 16px rgba(255, 150, 200, 0.5),
+                inset 0 -5px 15px rgba(220, 100, 150, 0.3),
+                inset 0 5px 15px rgba(255, 220, 240, 0.8);
+            color: #333;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 3px solid #ffafcc;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 12px 20px rgba(255, 150, 200, 0.6),
+                inset 0 -5px 15px rgba(220, 100, 150, 0.3),
+                inset 0 5px 15px rgba(255, 220, 240, 0.8);
+            animation: none;
+        }
+        
+        .modal-btn:active {
+            transform: translateY(2px);
+        }
+        
+        .success {
+            background: linear-gradient(145deg, #fff9c4, #ffecb3);
+            border: 5px solid #ffd54f;
+        }
+        
+        .failure {
+            background: linear-gradient(145deg, #e0e0e0, #cfcfcf);
+            border: 5px solid #9e9e9e;
+        }
+        
+        /* 气球装饰 */
+        .balloon {
+            position: absolute;
+            width: 60px;
+            height: 80px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .balloon::before {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            width: 2px;
+            height: 50px;
+            background: rgba(0,0,0,0.1);
+            transform: translateX(-50%);
+        }
+        
+        .balloon:nth-child(1) {
+            top: 20px;
+            left: 5%;
+            background: radial-gradient(circle at 30% 30%, #ff9ec7, #ff5a9c);
+            animation: floatBalloon 15s infinite linear;
+        }
+        
+        .balloon:nth-child(2) {
+            top: 120px;
+            right: 7%;
+            background: radial-gradient(circle at 30% 30%, #ffd19e, #ffa84a);
+            animation: floatBalloon 18s infinite linear;
+            animation-delay: 2s;
+        }
+        
+        .balloon:nth-child(3) {
+            bottom: 180px;
+            left: 12%;
+            background: radial-gradient(circle at 30% 30%, #9effc3, #4aff9d);
+            animation: floatBalloon 16s infinite linear;
+            animation-delay: 1s;
+        }
+        
+        @keyframes floatBalloon {
+            0% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-40px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0); }
+        }
+        
+        /* 云朵装饰 */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255,255,255,0.8);
+            z-index: 0;
+            filter: blur(5px);
+            animation: floatCloud 30s infinite linear;
+        }
+        
+        .cloud:nth-child(4) {
+            top: 15%;
+            right: 8%;
+            width: 100px;
+            height: 50px;
+            animation-delay: 0s;
+        }
+        
+        .cloud:nth-child(5) {
+            top: 60%;
+            left: 5%;
+            width: 120px;
+            height: 60px;
+            animation-delay: 5s;
+        }
+        
+        .cloud:nth-child(6) {
+            bottom: 10%;
+            right: 15%;
+            width: 80px;
+            height: 40px;
+            animation-delay: 10s;
+        }
+        
+        @keyframes floatCloud {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+            100% { transform: translateX(0); }
+        }
+        
+        /* 星星装饰 */
+        .star {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>');
+            background-size: contain;
+            animation: twinkle 3s infinite;
+            opacity: 0;
+            z-index: 2;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 3rem;
+                padding: 12px 40px;
+            }
+            
+            .word-card {
+                font-size: 1.8rem;
+                padding: 15px 25px;
+            }
+            
+            .btn {
+                font-size: 1.5rem;
+                padding: 12px 30px;
+            }
+            
+            .modal-text {
+                font-size: 2.2rem;
+            }
+            
+            .modal-btn {
+                font-size: 1.8rem;
+                padding: 15px 40px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2.5rem;
+                padding: 10px 30px;
+            }
+            
+            .word-card {
+                font-size: 1.5rem;
+                padding: 12px 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .modal-text {
+                font-size: 1.8rem;
+            }
+            
+            .modal-btn {
+                font-size: 1.5rem;
+                padding: 12px 30px;
+            }
+        }
+        
+        /* 音频控制面板 */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .sound-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffb6d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-btn:hover {
+            background: #ff8ec0;
+            transform: scale(1.1);
+        }
+        
+        .sound-btn i {
+            font-size: 20px;
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 装饰元素 -->
+    <div class="balloon"></div>
+    <div class="balloon"></div>
+    <div class="balloon"></div>
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    
+    <!-- 音频控制面板 -->
+    <div class="audio-controls">
+        <button class="sound-btn" id="toggleSound">
+            <i class="fas fa-volume-up"></i>
+        </button>
+    </div>
+    
+    <div class="header">
+        <h1 class="title">点词成句</h1>
+    </div>
+    
+    <div class="game-container">
+        <div class="word-bank" id="wordBank">
+            <!-- 词语卡片将通过JS生成 -->
+        </div>
+        
+        <div class="sentence-area empty" id="sentenceArea">
+            <!-- 句子区域 -->
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="checkBtn">检查句子</button>
+            <button class="btn" id="resetBtn">重新开始</button>
+            <button class="btn" id="newGameBtn">新的游戏</button>
+        </div>
+    </div>
+
+    <!-- 结果弹窗 -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content" id="modalContent">
+            <p class="modal-text" id="modalText"></p>
+            <button class="modal-btn" id="modalButton"></button>
+        </div>
+    </div>
+
+    <!-- 音频元素 -->
+    <audio id="successSound" preload="auto">
+        <source src="成功.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="interactionSound" preload="auto">
+        <source src="交互.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="failureSound" preload="auto">
+        <source src="制片帮素材_37250_尴尬02.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // 时间状语列表
+        const timeAdverbials = ["今天", "明天", "昨天", "周末", "每天", "下个星期", "明年", "后天", "现在", "以后", "早上", "晚上", "下午"];
+        
+        // 句子库 - 30个汉语句子模板
+        const sentenceTemplates = [
+            ["我", "爱", "学习", "汉语"],
+            ["今天", "天气", "很", "好"],
+            ["你", "想", "喝", "什么"],
+            ["他", "是", "我的", "朋友"],
+            ["我们", "一起", "去", "公园"],
+            ["这个", "苹果", "很", "甜"],
+            ["妈妈", "在", "厨房", "做饭"],
+            ["明天", "我", "要", "去", "学校"],
+            ["你", "喜欢", "吃", "中国菜", "吗"],
+            ["小猫", "在", "桌子", "下面"],
+            ["老师", "教", "我们", "写", "汉字"],
+            ["爸爸", "每天", "开车", "上班"],
+            ["妹妹", "有", "一个", "漂亮", "娃娃"],
+            ["中国", "的", "长城", "非常", "长"],
+            ["他", "会", "说", "三", "种", "语言"],
+            ["周末", "我们", "打算", "去", "爬山"],
+            ["请", "给", "我", "一杯", "水"],
+            ["哥哥", "比", "弟弟", "高", "一点"],
+            ["她", "的", "裙子", "很", "漂亮"],
+            ["图书馆", "里", "很", "安静"],
+            ["晚上", "我们", "要", "看", "电影"],
+            ["昨天", "我", "买", "了", "新书"],
+            ["下个星期", "我们", "有", "考试"],
+            ["下午", "我", "要", "和", "朋友", "见面"],
+            ["明天", "妈妈", "会", "做", "饺子"],
+            ["周末", "我", "打算", "去", "游泳"],
+            ["早上", "我", "喜欢", "喝", "咖啡"],
+            ["后天", "学校", "要", "举行", "运动会"],
+            ["现在", "我们", "开始", "上课"],
+            ["以后", "我", "想", "当", "老师"]
+        ];
+        
+        // 当前游戏数据
+        let currentWords = [];
+        let currentOriginalSentence = [];
+        
+        // DOM元素
+        const wordBank = document.getElementById('wordBank');
+        const sentenceArea = document.getElementById('sentenceArea');
+        const checkBtn = document.getElementById('checkBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const newGameBtn = document.getElementById('newGameBtn');
+        const resultModal = document.getElementById('resultModal');
+        const modalContent = document.getElementById('modalContent');
+        const modalText = document.getElementById('modalText');
+        const modalButton = document.getElementById('modalButton');
+        const toggleSound = document.getElementById('toggleSound');
+        
+        // 音频元素
+        const successSound = document.getElementById('successSound');
+        const interactionSound = document.getElementById('interactionSound');
+        const failureSound = document.getElementById('failureSound');
+        
+        // 声音状态
+        let soundEnabled = true;
+        
+        // 初始化游戏
+        function initGame() {
+            // 随机选择一个句子模板
+            const randomIndex = Math.floor(Math.random() * sentenceTemplates.length);
+            currentOriginalSentence = [...sentenceTemplates[randomIndex]];
+            currentWords = [...sentenceTemplates[randomIndex]];
+            
+            // 打乱词语顺序
+            shuffleArray(currentWords);
+            
+            // 清空词语区域
+            wordBank.innerHTML = '';
+            
+            // 创建词语卡片
+            currentWords.forEach(word => {
+                const wordCard = document.createElement('div');
+                wordCard.className = 'word-card';
+                wordCard.textContent = word;
+                wordCard.draggable = true;
+                
+                // 添加拖拽事件
+                wordCard.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', word);
+                    setTimeout(() => {
+                        wordCard.classList.add('dragging');
+                    }, 0);
+                    
+                    // 播放交互音效
+                    playSound(interactionSound);
+                });
+                
+                wordCard.addEventListener('dragend', () => {
+                    wordCard.classList.remove('dragging');
+                });
+                
+                // 点击事件 - 添加交互音效
+                wordCard.addEventListener('click', () => {
+                    playSound(interactionSound);
+                });
+                
+                wordBank.appendChild(wordCard);
+            });
+            
+            // 清空句子区域
+            sentenceArea.innerHTML = '';
+            sentenceArea.classList.add('empty');
+        }
+        
+        // 播放音效
+        function playSound(sound) {
+            if (!soundEnabled) return;
+            
+            try {
+                sound.currentTime = 0;
+                sound.play();
+            } catch (e) {
+                console.log("音频播放错误:", e);
+            }
+        }
+        
+        // 打乱数组顺序 (Fisher-Yates算法)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // 设置拖放区域
+        sentenceArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            sentenceArea.classList.add('drag-over');
+        });
+        
+        sentenceArea.addEventListener('dragleave', () => {
+            sentenceArea.classList.remove('drag-over');
+        });
+        
+        sentenceArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            sentenceArea.classList.remove('drag-over');
+            
+            const word = e.dataTransfer.getData('text/plain');
+            
+            // 创建新的词语卡片
+            const wordCard = document.createElement('div');
+            wordCard.className = 'word-card';
+            wordCard.textContent = word;
+            wordCard.draggable = true;
+            
+            // 添加拖拽事件
+            wordCard.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', word);
+                setTimeout(() => {
+                    wordCard.classList.add('dragging');
+                }, 0);
+                
+                // 播放交互音效
+                playSound(interactionSound);
+            });
+            
+            wordCard.addEventListener('dragend', () => {
+                wordCard.classList.remove('dragging');
+            });
+            
+            // 双击移回词语区域
+            wordCard.addEventListener('dblclick', () => {
+                sentenceArea.removeChild(wordCard);
+                if (sentenceArea.children.length === 0) {
+                    sentenceArea.classList.add('empty');
+                }
+                
+                // 播放交互音效
+                playSound(interactionSound);
+            });
+            
+            sentenceArea.appendChild(wordCard);
+            sentenceArea.classList.remove('empty');
+        });
+        
+        // 显示结果弹窗
+        function showResultModal(isSuccess) {
+            if (isSuccess) {
+                modalContent.className = 'modal-content success';
+                modalText.textContent = '恭喜你，回答正确！';
+                modalButton.textContent = '下一题';
+                
+                // 播放成功音效
+                playSound(successSound);
+                
+                // 添加星星装饰
+                createStars();
+            } else {
+                modalContent.className = 'modal-content failure';
+                modalText.textContent = '很遗憾，回答错误';
+                modalButton.textContent = '重新作答';
+                
+                // 播放失败音效
+                playSound(failureSound);
+            }
+            resultModal.style.display = 'flex';
+        }
+        
+        // 创建星星动画效果
+        function createStars() {
+            for (let i = 0; i < 15; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                star.style.width = `${10 + Math.random() * 30}px`;
+                star.style.height = star.style.width;
+                document.body.appendChild(star);
+                
+                // 动画结束后移除星星
+                setTimeout(() => {
+                    star.remove();
+                }, 3000);
+            }
+        }
+        
+        // 关闭结果弹窗
+        function closeModal() {
+            resultModal.style.display = 'none';
+        }
+        
+        // 检查句子是否正确（支持时间状语的灵活位置）
+        function checkSentence(userSentence, originalSentence) {
+            // 如果完全匹配，直接返回true
+            if (JSON.stringify(userSentence) === JSON.stringify(originalSentence)) {
+                return true;
+            }
+            
+            // 检查是否有时间状语
+            const hasTimeAdverbial = originalSentence.some(word => timeAdverbials.includes(word));
+            
+            // 如果没有时间状语，则必须完全匹配
+            if (!hasTimeAdverbial) {
+                return false;
+            }
+            
+            // 找出时间状语在原始句子中的位置
+            let timeWord = '';
+            let timeIndex = -1;
+            for (let i = 0; i < originalSentence.length; i++) {
+                if (timeAdverbials.includes(originalSentence[i])) {
+                    timeWord = originalSentence[i];
+                    timeIndex = i;
+                    break;
+                }
+            }
+            
+            // 检查用户句子中是否包含时间状语
+            if (!userSentence.includes(timeWord)) {
+                return false;
+            }
+            
+            // 获取用户句子中时间状语的位置
+            const userTimeIndex = userSentence.indexOf(timeWord);
+            
+            // 允许的位置：句首(0)或主语之后(1)
+            const validPositions = [0, 1];
+            
+            // 检查时间状语位置是否有效
+            if (!validPositions.includes(userTimeIndex)) {
+                return false;
+            }
+            
+            // 检查其他词语的顺序是否相同
+            const originalWithoutTime = [...originalSentence];
+            originalWithoutTime.splice(timeIndex, 1);
+            
+            const userWithoutTime = [...userSentence];
+            userWithoutTime.splice(userTimeIndex, 1);
+            
+            return JSON.stringify(originalWithoutTime) === JSON.stringify(userWithoutTime);
+        }
+        
+        // 检查句子按钮
+        checkBtn.addEventListener('click', () => {
+            // 播放交互音效
+            playSound(interactionSound);
+            
+            const wordsInSentence = [...sentenceArea.children].map(card => card.textContent);
+            const isCorrect = checkSentence(wordsInSentence, currentOriginalSentence);
+            
+            showResultModal(isCorrect);
+        });
+        
+        // 模态框按钮事件
+        modalButton.addEventListener('click', () => {
+            // 播放交互音效
+            playSound(interactionSound);
+            
+            if (modalButton.textContent === '下一题') {
+                closeModal();
+                initGame();
+            } else {
+                closeModal();
+                resetGame();
+            }
+        });
+        
+        // 重置游戏（当前题目）
+        function resetGame() {
+            // 播放交互音效
+            playSound(interactionSound);
+            
+            // 清空句子区域
+            sentenceArea.innerHTML = '';
+            sentenceArea.classList.add('empty');
+            
+            // 重新生成词语卡片
+            shuffleArray(currentWords);
+            wordBank.innerHTML = '';
+            
+            currentWords.forEach(word => {
+                const wordCard = document.createElement('div');
+                wordCard.className = 'word-card';
+                wordCard.textContent = word;
+                wordCard.draggable = true;
+                
+                wordCard.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', word);
+                    setTimeout(() => {
+                        wordCard.classList.add('dragging');
+                    }, 0);
+                    
+                    // 播放交互音效
+                    playSound(interactionSound);
+                });
+                
+                wordCard.addEventListener('dragend', () => {
+                    wordCard.classList.remove('dragging');
+                });
+                
+                wordBank.appendChild(wordCard);
+            });
+        }
+        
+        // 重置按钮
+        resetBtn.addEventListener('click', resetGame);
+        
+        // 新游戏按钮
+        newGameBtn.addEventListener('click', () => {
+            // 播放交互音效
+            playSound(interactionSound);
+            initGame();
+        });
+        
+        // 初始化游戏
+        initGame();
+        
+        // 声音开关
+        toggleSound.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            if (soundEnabled) {
+                toggleSound.innerHTML = '<i class="fas fa-volume-up"></i>';
+                toggleSound.style.background = '#ffb6d9';
+            } else {
+                toggleSound.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                toggleSound.style.background = '#cccccc';
+            }
+        });
+    </script>
+</body>
+</html>

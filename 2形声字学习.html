@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>形声字汉字学习 - 汉语国际教育</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e8f4f8, #d1e7fa);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #1a73e8, #4285f4);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-box {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+        
+        .stat-label {
+            font-size: 0.95rem;
+            color: #5f6368;
+        }
+        
+        .game-area {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .question {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #1a4480;
+            font-weight: bold;
+        }
+        
+        .question-text {
+            margin-bottom: 10px;
+        }
+        
+        .components-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .component {
+            width: 95px;
+            height: 95px;
+            background: linear-gradient(135deg, #f1f8fe, #e3f0ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            user-select: none;
+            border: 2px solid #d1e0f7;
+        }
+        
+        .component:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #e3f0ff, #d1e7fa);
+        }
+        
+        .component.selected {
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            border: 2px solid #1a73e8;
+            background: #e8f0fe;
+        }
+        
+        .equation-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .equation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 2.5rem;
+            min-height: 150px;
+        }
+        
+        .equation-part {
+            min-width: 95px;
+            min-height: 95px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .operator {
+            color: #fa7b17;
+            font-weight: bold;
+            padding: 0 10px;
+        }
+        
+        .target-part {
+            background: #f8f9fa;
+            border: 3px dashed #d1e0f7;
+            min-width: 95px;
+            min-height: 95px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .target-part.filled {
+            background: #e8f5e9;
+            border: 3px solid #34a853;
+            color: #1a4480;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 14px 30px;
+            font-size: 1.15rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #1a73e8, #4285f4);
+            color: white;
+            box-shadow: 0 5px 12px rgba(26, 115, 232, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #fa7b17, #fbbc05);
+            color: white;
+            box-shadow: 0 5px 12px rgba(250, 123, 23, 0.4);
+        }
+        
+        .btn-check {
+            background: linear-gradient(45deg, #34a853, #0f9d58);
+            color: white;
+            box-shadow: 0 5px 12px rgba(52, 168, 83, 0.4);
+            font-size: 1.25rem;
+            padding: 16px 45px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .feedback {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            min-height: 40px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .correct {
+            background-color: #e8f5e9;
+            color: #0f9d58;
+            border: 2px solid #34a853;
+        }
+        
+        .incorrect {
+            background-color: #fce8e6;
+            color: #ea4335;
+            border: 2px solid #ea4335;
+        }
+        
+        .instructions {
+            background: #fff5e6;
+            border-left: 5px solid #fa7b17;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .instructions h3 {
+            color: #fa7b17;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .explanation {
+            background: #e8f5e9;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            border-left: 5px solid #34a853;
+            display: none;
+        }
+        
+        .explanation.show {
+            display: block;
+        }
+        
+        .explanation h3 {
+            color: #0f9d58;
+            margin-bottom: 15px;
+        }
+        
+        .classification {
+            display: flex;
+            margin-top: 10px;
+            gap: 10px;
+        }
+        
+        .character-type {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .pictophonetic {
+            background: #f3e5f5;
+            color: #9c27b0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #5f6368;
+            font-size: 0.95rem;
+            padding: 20px;
+        }
+        
+        .progress-container {
+            height: 8px;
+            background: #e8eaed;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #34a853, #4285f4);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .difficulty {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #e3f0ff;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: #1a73e8;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .equation {
+                font-size: 2rem;
+            }
+            
+            .component, .equation-part, .target-part {
+                width: 85px;
+                height: 85px;
+                font-size: 2.2rem;
+            }
+            
+            .question {
+                font-size: 1.5rem;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            .btn-check {
+                padding: 14px 35px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .equation {
+                font-size: 1.8rem;
+            }
+            
+            .component, .equation-part, .target-part {
+                width: 75px;
+                height: 75px;
+                font-size: 1.8rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-container {
+                padding: 10px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>形声字汉字学习</h1>
+            <p class="subtitle">通过形旁和声旁组合学习汉字结构 · 汉语国际教育互动课件</p>
+        </header>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-value" id="accuracy">0%</div>
+                <div class="stat-label">答题正确率</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="completed">0</div>
+                <div class="stat-label">已完成题目</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="progress">1/6</div>
+                <div class="stat-label">当前进度</div>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar" style="width: 17%"></div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📝 学习说明</h3>
+            <p>形声字由形旁（表示意义类别的部首）和声旁（表示发音的部分）组成。请从左侧选择正确的声旁，填充到方程中的正确位置。</p>
+            <p><strong>形旁</strong>表示意义（如水、木、人等） · <strong>声旁</strong>表示发音（如胡、可、采等）</p>
+        </div>
+        
+        <div class="game-area">
+            <div class="question">
+                <div class="question-text" id="question-text">请组合出表示"流水通道"的汉字</div>
+                <div><span id="character-type" class="character-type pictophonetic">形声字</span> <span class="difficulty">难度: ★★☆</span></div>
+            </div>
+            
+            <div class="components-container" id="components-container">
+                <!-- 组件会动态生成 -->
+            </div>
+            
+            <div class="equation-container">
+                <div class="equation" id="equation">
+                    <!-- 方程式会动态生成 -->
+                </div>
+                
+                <div class="equation">
+                    <div class="equation-part">形旁（意义）</div>
+                    <div class="operator">+</div>
+                    <div class="equation-part">声旁（发音）</div>
+                    <div class="operator">=</div>
+                    <div class="equation-part">形声字</div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button class="btn btn-primary" id="prev-btn">上一题</button>
+                <button class="btn btn-check" id="check-btn">检查答案</button>
+                <button class="btn btn-secondary" id="next-btn">下一题</button>
+            </div>
+            
+            <div class="feedback" id="feedback">请选择左侧的声旁填充到右侧空位中</div>
+        </div>
+        
+        <div class="explanation" id="explanation">
+            <!-- 解释内容会动态生成 -->
+        </div>
+        
+        <footer>
+            <p>汉语国际教育汉字学习系统 © 2023 | 可在手机、平板、电脑浏览器中使用</p>
+            <p>无需安装软件·支持触摸屏和鼠标操作·响应式设计适配所有设备</p>
+        </footer>
+    </div>
+
+    <script>
+        // 形声字数据结构（全部符合传统汉字释义）
+        const charactersData = [
+            {
+                id: 1,
+                type: "形声字",
+                hint: "流水通道",
+                answer: "河",
+                components: ["氵", "可"],
+                distractors: ["湖", "何", "呵"],
+                explanation: "『河』是形声字。形旁『氵』（水）表示与水有关，声旁『可』表示发音。传统释义指天然或人工的水道。",
+                meaning: "自然或人工的水道，流水通道",
+                composition: "形旁（意义）: 氵（水）<br>声旁（发音）: 可"
+            },
+            {
+                id: 2,
+                type: "形声字",
+                hint: "食用植物",
+                answer: "菜",
+                components: ["艹", "采"],
+                distractors: ["彩", "踩", "采"],
+                explanation: "『菜』是形声字。形旁『艹』（草字头）表示植物，声旁『采』表示发音。传统释义指可做副食品的植物。",
+                meaning: "可做副食品的植物，蔬菜",
+                composition: "形旁（意义）: 艹（植物）<br>声旁（发音）: 采"
+            },
+            {
+                id: 3,
+                type: "形声字",
+                hint: "女性长辈",
+                answer: "姑",
+                components: ["女", "古"],
+                distractors: ["故", "咕", "辜"],
+                explanation: "『姑』是形声字。形旁『女』表示性别，声旁『古』表示发音。传统释义指父亲的姐妹或丈夫的母亲。",
+                meaning: "丈夫的母亲，父亲的姐妹",
+                composition: "形旁（意义）: 女（女性）<br>声旁（发音）: 古"
+            },
+            {
+                id: 4,
+                type: "形声字",
+                hint: "被陆地包围的大片水域，面积小于海",
+                answer: "湖",
+                components: ["氵", "胡"],
+                distractors: ["糊", "瑚", "葫"],
+                explanation: "『湖』是形声字。形旁『氵』（水）表示与水有关，声旁『胡』表示发音。传统释义指被陆地包围的大片水域。",
+                meaning: "被陆地包围的大片水域",
+                composition: "形旁（意义）: 氵（水）<br>声旁（发音）: 胡"
+            },
+            {
+                id: 5,
+                type: "形声字",
+                hint: "玉的雕琢",
+                answer: "理",
+                components: ["王", "里"],
+                distractors: ["狸", "厘", "鲤"],
+                explanation: "『理』是形声字。形旁『王』（玉）表示玉石，声旁『里』表示发音。传统释义指雕琢加工玉石，引申为治理、整理。",
+                meaning: "雕琢玉石，治理，整理",
+                composition: "形旁（意义）: 王（玉）<br>声旁（发音）: 里"
+            },
+            {
+                id: 6,
+                type: "形声字",
+                hint: "昆虫种类",
+                answer: "蝴",
+                components: ["虫", "胡"],
+                distractors: ["湖", "糊", "瑚"],
+                explanation: "『蝴』是形声字。形旁『虫』表示昆虫，声旁『胡』表示发音。传统释义指一种能飞且常与花朵伴生的昆虫。",
+                meaning: "一种有翅膀、吸花蜜的昆虫",
+                composition: "形旁（意义）: 虫（昆虫）<br>声旁（发音）: 胡"
+            }
+        ];
+        
+        // 当前题目索引
+        let currentQuestionIndex = 0;
+        let score = {
+            total: 0,
+            correct: 0,
+            attempted: 0
+        };
+        let selectedComponent = null;
+        let targetSlot = null;
+        
+        // DOM元素
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const checkBtn = document.getElementById('check-btn');
+        const feedbackEl = document.getElementById('feedback');
+        const componentsContainer = document.getElementById('components-container');
+        const equationDisplay = document.getElementById('equation');
+        const accuracyEl = document.getElementById('accuracy');
+        const completedEl = document.getElementById('completed');
+        const progressEl = document.getElementById('progress');
+        const progressBar = document.getElementById('progress-bar');
+        const explanationEl = document.getElementById('explanation');
+        const questionText = document.getElementById('question-text');
+        const characterType = document.getElementById('character-type');
+        
+        // 初始化游戏
+        function initGame() {
+            loadQuestion(currentQuestionIndex);
+            updateStats();
+        }
+        
+        // 加载题目
+        function loadQuestion(index) {
+            const question = charactersData[index];
+            selectedComponent = null;
+            targetSlot = null;
+            
+            // 重置状态
+            feedbackEl.textContent = "请选择左侧的声旁填充到右侧空位中";
+            feedbackEl.className = "feedback";
+            explanationEl.classList.remove("show");
+            
+            // 更新题目
+            questionText.textContent = `请组合出表示"${question.hint}"的汉字`;
+            characterType.textContent = question.type;
+            progressEl.textContent = `${index + 1}/${charactersData.length}`;
+            
+            // 清除现有组件
+            componentsContainer.innerHTML = '';
+            equationDisplay.innerHTML = '';
+            
+            // 添加组件（确保正确答案包含在选项中）
+            let allComponents = [...question.distractors];
+            
+            // 随机排序
+            shuffleArray(allComponents);
+            
+            // 添加声旁元素（最多4个，确保正确答案存在）
+            allComponents.slice(0, 3).forEach(comp => {
+                if(comp !== question.components[1]) {
+                    addComponent(comp);
+                }
+            });
+            // 确保正确答案存在
+            addComponent(question.components[1]);
+            
+            // 添加方程
+            const formPart = document.createElement('div');
+            formPart.className = 'equation-part';
+            formPart.textContent = question.components[0]; // 形旁
+            equationDisplay.appendChild(formPart);
+            
+            const plus = document.createElement('div');
+            plus.className = 'operator';
+            plus.textContent = '+';
+            equationDisplay.appendChild(plus);
+            
+            const target = document.createElement('div');
+            target.className = 'target-part';
+            target.id = 'target-slot';
+            target.innerHTML = "";
+            equationDisplay.appendChild(target);
+            targetSlot = target;
+            
+            const equals = document.createElement('div');
+            equals.className = 'operator';
+            equals.textContent = '=';
+            equationDisplay.appendChild(equals);
+            
+            const result = document.createElement('div');
+            result.className = 'equation-part';
+            result.textContent = '?';
+            result.id = 'result-display';
+            equationDisplay.appendChild(result);
+            
+            // 更新进度条
+            const progressPercent = Math.round((index + 1) / charactersData.length * 100);
+            progressBar.style.width = `${progressPercent}%`;
+        }
+        
+        function addComponent(comp) {
+            const compEl = document.createElement('div');
+            compEl.className = 'component';
+            compEl.dataset.component = comp;
+            compEl.textContent = comp;
+            compEl.addEventListener('click', () => {
+                // 移除之前选中的样式
+                document.querySelectorAll('.component.selected').forEach(el => el.classList.remove('selected'));
+                // 添加选中样式
+                compEl.classList.add('selected');
+                selectedComponent = comp;
+                feedbackEl.textContent = `已选中：${comp}，请点击右侧空白位置`;
+            });
+            componentsContainer.appendChild(compEl);
+        }
+        
+        // 目标位置点击事件委托
+        document.addEventListener('click', function(e) {
+            if(e.target && e.target.id === 'target-slot' && selectedComponent) {
+                e.target.textContent = selectedComponent;
+                e.target.classList.add('filled');
+                feedbackEl.textContent = `已放置：${selectedComponent}`;
+                
+                // 清除选择
+                document.querySelectorAll('.component.selected').forEach(el => el.classList.remove('selected'));
+                selectedComponent = null;
+            }
+        });
+        
+        // 检查答案
+        function checkAnswer() {
+            const question = charactersData[currentQuestionIndex];
+            
+            // 检查是否已经选择
+            if (!targetSlot || !targetSlot.textContent) {
+                feedbackEl.textContent = "请先选择并放置一个声旁";
+                feedbackEl.className = "feedback incorrect";
+                return;
+            }
+            
+            score.attempted++;
+            score.total++;
+            
+            if (targetSlot.textContent === question.components[1]) {
+                feedbackEl.textContent = `正确！您成功组合出了汉字：${question.answer}`;
+                feedbackEl.className = "feedback correct";
+                score.correct++;
+                
+                // 显示正确答案
+                document.getElementById('result-display').textContent = question.answer;
+                document.getElementById('result-display').style.color = "#1a73e8";
+                document.getElementById('result-display').style.fontWeight = "bold";
+                
+                // 显示解释
+                explanationEl.innerHTML = `
+                    <h3>📚 汉字知识：${question.answer}（${question.type}）</h3>
+                    <p>${question.explanation}</p>
+                    <p><strong>传统释义：</strong>${question.meaning}</p>
+                    <p><strong>结构组成：</strong><br>${question.composition}</p>
+                `;
+                explanationEl.classList.add("show");
+            } else {
+                feedbackEl.textContent = `组合有误！尝试选择其他声旁`;
+                feedbackEl.className = "feedback incorrect";
+                
+                // 重置目标槽
+                targetSlot.textContent = "";
+                targetSlot.classList.remove('filled');
+            }
+            
+            // 更新统计数据
+            updateStats();
+        }
+        
+        // 更新统计数据
+        function updateStats() {
+            const accuracy = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
+            accuracyEl.textContent = `${accuracy}%`;
+            completedEl.textContent = score.total;
+        }
+        
+        // 下一题
+        function nextQuestion() {
+            if (currentQuestionIndex < charactersData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            } else {
+                feedbackEl.textContent = "恭喜！您已完成所有题目";
+                feedbackEl.className = "feedback correct";
+            }
+        }
+        
+        // 上一题
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+            } else {
+                feedbackEl.textContent = "已经是第一题了！";
+                feedbackEl.className = "feedback incorrect";
+            }
+        }
+        
+        // 辅助函数：数组随机排序
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // 事件监听
+        checkBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextQuestion);
+        prevBtn.addEventListener('click', prevQuestion);
+        
+        // 启动游戏
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>

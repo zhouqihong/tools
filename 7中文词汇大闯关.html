@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文词汇闯关大挑战</title>
+    <style>
+        /* 保持原有样式，新增欢迎界面样式 */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #000000 25%, #333333 100%);
+            color: white;
+            animation: gradient 15s ease infinite;
+            background-size: 400% 400%;
+            position: relative;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .start-btn {
+            font-size: 2rem;
+            padding: 20px 50px;
+            margin-top: 30px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(45deg, #007bff, #4ecdc4);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* 添加 correct 和 wrong 样式类 */
+        .correct {
+            background-color: green;
+        }
+
+        .wrong {
+            background-color: red;
+        }
+
+        /* 其他样式 */
+        #game-container {
+            padding: 20px;
+        }
+
+        #score {
+            font-size: 1.5rem;
+            color: #4ecdc4;
+            margin-bottom: 20px;
+        }
+
+        #level-selection {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .level-btn {
+            font-size: 1.5rem;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #word-display {
+            margin-bottom: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .button-group button {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .game-rules {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #f44336;
+            color: white;
+        }
+
+        .victory-screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            color: white;
+        }
+
+        .victory-text {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .encouragement-text {
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            font-size: 2rem;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(45deg, #007bff, #4ecdc4);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .self-challenge-btn {
+            font-size: 2rem;
+            padding: 20px 50px;
+            margin-top: 30px;
+            margin-left: 20px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(45deg, #FF6F61, #FFB347);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .self-challenge-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .input-group input {
+            font-size: 1.2rem;
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .add-word-btn {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .start-self-challenge-btn {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .self-challenge-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .word-list {
+            margin-top: 20px;
+            width: 80%;
+        }
+
+        .word-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        .word-item button {
+            font-size: 1rem;
+            padding: 5px 10px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #FFB347;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .author-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="welcome-screen" class="welcome-screen">
+        <span class="author-info">作者：胡恩源</span>
+        <h1 style="font-size: 3rem; text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);">中文词汇大闯关</h1>
+        <p style="font-size: 1.5rem; margin: 20px 0;">根据<a href="2021-国标-国际中文教育中文水平等级标准.pdf" target="_blank">《国际中文水平等级标准》</a>设计</p>
+        <div class="game-rules">
+            <h2>游戏规则</h2>
+            <p>1. 选择难度等级开始游戏。</p>
+            <p>2. 每答对一题得10分，答错一题扣5分。</p>
+            <p>3. 完成当前等级所有题目后，可升级到下一等级。</p>
+            <p>4. 等级循环为初等（1 - 3级）、中等（4 - 6级）、高等（7 - 9级）。</p>
+            <p>5. 达到100分游戏胜利。</p>
+        </div>
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <button class="start-btn" onclick="showLevelSelection(); playClickSound()">开始游戏</button>
+            <button class="self-challenge-btn" onclick="showSelfChallengeScreen(); playClickSound()">自我挑战</button>
+        </div>
+    </div>
+
+    <div id="self-challenge-screen" class="self-challenge-screen">
+        <button class="back-btn" onclick="goBackToWelcomeFromSelfChallenge(); playClickSound()">返回</button>
+        <h2>自我挑战 - 添加词汇</h2>
+        <div class="input-group">
+            <input type="text" id="chinese-word" placeholder="中文词汇">
+            <input type="text" id="pinyin" placeholder="拼音">
+            <input type="text" id="meaning" placeholder="英文释义">
+            <button class="add-word-btn" onclick="addSelfChallengeWord(); playClickSound()">添加词汇</button>
+            <button class="start-self-challenge-btn" onclick="startSelfChallengeGame(); playClickSound()">开始自我挑战</button>
+        </div>
+        <div class="word-list" id="word-list"></div>
+    </div>
+
+    <audio id="bgMusic" loop src="https://assets.mixkit.co/active_storage/sfx/3416/3416-preview.mp3"></audio>
+    <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/3028/3028-preview.mp3"></audio>
+    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/1129/1129-preview.mp3"></audio>
+    <audio id="wrongSound" src="https://assets.mixkit.co/active_storage/sfx/1130/1130-preview.mp3"></audio>
+    <audio id="victorySound" src="https://assets.mixkit.co/active_storage/sfx/2858/2858-preview.mp3"></audio>
+
+    <div id="game-container" style="display: none;">
+        <button class="back-btn" onclick="goBackToWelcome(); playClickSound()">返回</button>
+        <div id="score" style="font-size: 1.5rem; color: #4ecdc4; margin: 20px 0;"></div>
+        <div id="level-selection" style="text-align: center; margin-bottom: 30px;">
+            <h2>选择难度等级</h2>
+            <button class="level-btn" style="background-color: #007bff;" onclick="startGame(1); playClickSound()">初等（1 - 3 级）</button>
+            <button class="level-btn" style="background-color: #4CAF50;" onclick="startGame(2); playClickSound()">中等（4 - 6 级）</button>
+            <button class="level-btn" style="background-color: #9c27b0;" onclick="startGame(3); playClickSound()">高等（7 - 9 级）</button>
+        </div>
+
+        <div id="word-display" class="word-card" style="display: none;"></div>
+        <div id="options" class="button-group" style="display: none;"></div>
+    </div>
+
+    <div id="victory-screen" class="victory-screen">
+        <div class="victory-text">游戏胜利！</div>
+        <div class="encouragement-text"></div>
+        <button class="restart-btn" onclick="restartGame(); playClickSound()">重新开始</button>
+    </div>
+
+    <script>
+        // 从文献提取的典型词汇（每级20个示例，可扩展）
+        const levelData = {
+            1: {
+                name: '初等',
+                words: [
+                    { chinese: "你好", pinyin: "nǐ hǎo", meaning: "Hello" },
+                    { chinese: "谢谢", pinyin: "xiè xie", meaning: "Thank you" },
+                    { chinese: "再见", pinyin: "zài jiàn", meaning: "Goodbye" },
+                    { chinese: "吃饭", pinyin: "chī fàn", meaning: "Eat meal" },
+                    { chinese: "学校", pinyin: "xué xiào", meaning: "School" },
+                    { chinese: "老师", pinyin: "lǎo shī", meaning: "Teacher" },
+                    { chinese: "学生", pinyin: "xué sheng", meaning: "Student" },
+                    { chinese: "今天", pinyin: "jīn tiān", meaning: "Today" },
+                    { chinese: "明天", pinyin: "míng tiān", meaning: "Tomorrow" },
+                    { chinese: "星期", pinyin: "xīng qī", meaning: "Week" },
+                    { chinese: "电话", pinyin: "diàn huà", meaning: "Telephone" },
+                    { chinese: "手机", pinyin: "shǒu jī", meaning: "Mobile phone" },
+                    { chinese: "汽车", pinyin: "qì chē", meaning: "Car" },
+                    { chinese: "红色", pinyin: "hóng sè", meaning: "Red" },
+                    { chinese: "蓝色", pinyin: "lán sè", meaning: "Blue" },
+                    { chinese: "白色", pinyin: "bái sè", meaning: "White" },
+                    { chinese: "开心", pinyin: "kāi xīn", meaning: "Happy" },
+                    { chinese: "难过", pinyin: "nán guò", meaning: "Sad" },
+                    { chinese: "喜欢", pinyin: "xǐ huan", meaning: "Like" },
+                    { chinese: "讨厌", pinyin: "tǎo yàn", meaning: "Dislike" }
+                ],
+                bgColor: ["#007bff", "#64b5f6"],
+                questionCount: 10,
+                wrongPool: ["Hi", "Good morning", "Good night", "Study", "Classmate", "Book", "Pen", "Year", "Month", "Day"]
+            },
+            2: {
+                name: '中等',
+                words: [
+                    { chinese: "因为", pinyin: "yīn wèi", meaning: "Because" },
+                    { chinese: "所以", pinyin: "suǒ yǐ", meaning: "So" },
+                    { chinese: "虽然", pinyin: "suī rán", meaning: "Although" },
+                    { chinese: "但是", pinyin: "dàn shì", meaning: "But" },
+                    { chinese: "如果", pinyin: "rú guǒ", meaning: "If" },
+                    { chinese: "就", pinyin: "jiù", meaning: "Then" },
+                    { chinese: "而且", pinyin: "ér qiě", meaning: "And" },
+                    { chinese: "或者", pinyin: "huò zhě", meaning: "Or" },
+                    { chinese: "重要", pinyin: "zhòng yào", meaning: "Important" },
+                    { chinese: "容易", pinyin: "róng yì", meaning: "Easy" },
+                    { chinese: "困难", pinyin: "kùn nán", meaning: "Difficult" },
+                    { chinese: "帮助", pinyin: "bāng zhù", meaning: "Help" },
+                    { chinese: "学习", pinyin: "xué xí", meaning: "Study" },
+                    { chinese: "工作", pinyin: "gōng zuò", meaning: "Work" },
+                    { chinese: "生活", pinyin: "shēng huó", meaning: "Life" },
+                    { chinese: "家庭", pinyin: "jiā tíng", meaning: "Family" },
+                    { chinese: "朋友", pinyin: "péng you", meaning: "Friend" },
+                    { chinese: "旅行", pinyin: "lǚ xíng", meaning: "Travel" },
+                    { chinese: "文化", pinyin: "wén huà", meaning: "Culture" },
+                    { chinese: "历史", pinyin: "lì shǐ", meaning: "History" }
+                ],
+                bgColor: ["#4CAF50", "#81c784"],
+                questionCount: 15,
+                wrongPool: ["Therefore", "However", "But also", "Maybe", "Perhaps", "Since", "Until", "Before", "After", "During"]
+            },
+            3: {
+                name: '高等',
+                words: [
+                    { chinese: "辩证", pinyin: "biàn zhèng", meaning: "Dialectical" },
+                    { chinese: "逻辑", pinyin: "luó jí", meaning: "Logic" },
+                    { chinese: "哲学", pinyin: "zhé xué", meaning: "Philosophy" },
+                    { chinese: "经济", pinyin: "jīng jì", meaning: "Economy" },
+                    { chinese: "政治", pinyin: "zhèng zhì", meaning: "Politics" },
+                    { chinese: "社会", pinyin: "shè huì", meaning: "Society" },
+                    { chinese: "可持续发展", pinyin: "kě chí xù fā zhǎn", meaning: "Sustainable development" },
+                    { chinese: "环境保护", pinyin: "huán jìng bǎo hù", meaning: "Environmental protection" },
+                    { chinese: "科技创新", pinyin: "kē jì chuàng xīn", meaning: "Technological innovation" },
+                    { chinese: "全球化", pinyin: "quán qiú huà", meaning: "Globalization" },
+                    { chinese: "传统文化", pinyin: "chuán tǒng wén huà", meaning: "Traditional culture" },
+                    { chinese: "现代艺术", pinyin: "xiàn dài yì shù", meaning: "Modern art" },
+                    { chinese: "人工智能", pinyin: "rén gōng zhì néng", meaning: "Artificial intelligence" },
+                    { chinese: "国际贸易", pinyin: "guó jì mào yì", meaning: "International trade" },
+                    { chinese: "法律体系", pinyin: "fǎ lǜ tǐ xì", meaning: "Legal system" },
+                    { chinese: "民主自由", pinyin: "mín zhǔ zì yóu", meaning: "Democracy and freedom" },
+                    { chinese: "科学技术", pinyin: "kē xué jì shù", meaning: "Science and technology" },
+                    { chinese: "文化交流", pinyin: "wén huà jiāo liú", meaning: "Cultural exchange" },
+                    { chinese: "经济全球化", pinyin: "jīng jì quán qiú huà", meaning: "Economic globalization" },
+                    { chinese: "社会进步", pinyin: "shè huì jìn bù", meaning: "Social progress" }
+                ],
+                bgColor: ["#9c27b0", "#ba68c8"],
+                questionCount: 20,
+                wrongPool: ["Dialectics", "Logics", "Philosophies", "Economics", "Politics", "Society", "Development", "Protection", "Innovation", "Global"]
+            }
+        };
+
+        let currentLevel = 0;
+        let score = 0;
+        let questions = [];
+        let currentQuestion = 0;
+        let selfChallengeWords = JSON.parse(localStorage.getItem('selfChallengeWords')) || [];
+
+        function showLevelSelection() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            document.getElementById('score').textContent = `当前等级：无 分数：${score}`;
+        }
+
+        function startGame(level) {
+            currentLevel = level;
+            score = 0;
+            currentQuestion = 0;
+            questions = levelData[level].words.map(word => ({
+                ...word,
+                options: shuffle([word.meaning, ...getWrongOptions(word.meaning, level)]),
+            }));
+            changeBackground(level);
+            playQuestion();
+            document.getElementById('bgMusic').play();
+        }
+
+        function playQuestion() {
+            if (score >= 100) {
+                showVictoryScreen();
+                return;
+            }
+            if (currentQuestion >= (selfChallengeWords.length > 0 ? selfChallengeWords.length : levelData[currentLevel].questionCount)) {
+                if (selfChallengeWords.length > 0) {
+                    alert(`恭喜！完成自我挑战！\n分数：${score}`);
+                    document.getElementById('self-challenge-screen').style.display = 'none';
+                } else {
+                    alert(`恭喜！完成${levelData[currentLevel].name}等级挑战！\n分数：${score}`);
+                    currentLevel = (currentLevel % 3) + 1; // 循环切换等级
+                    startGame(currentLevel);
+                }
+                return;
+            }
+
+            const question = selfChallengeWords.length > 0 ? selfChallengeWords[currentQuestion] : questions[currentQuestion];
+            document.getElementById('word-display').innerHTML = `
+                <h3>词汇：${question.chinese}</h3>
+                <p>拼音：${question.pinyin}</p>
+            `;
+
+            document.getElementById('options').innerHTML = question.options.map(option => `
+                <button onclick="checkAnswer(this, '${question.meaning}')">${option}</button>
+            `).join('');
+
+            document.getElementById('score').textContent = `当前等级：${selfChallengeWords.length > 0 ? '自我挑战' : levelData[currentLevel].name} 分数：${score}`;
+            document.getElementById('word-display').style.display = 'block';
+            document.getElementById('options').style.display = 'flex';
+            currentQuestion++;
+        }
+
+        function checkAnswer(btn, correctAnswer) {
+            if (btn.textContent === correctAnswer) {
+                btn.classList.add('correct');
+                score += 10;
+                document.getElementById('correctSound').play();
+                setTimeout(() => {
+                    btn.classList.remove('correct');
+                    playQuestion();
+                }, 1000);
+            } else {
+                btn.classList.add('wrong');
+                score -= 5;
+                document.getElementById('wrongSound').play();
+                setTimeout(() => {
+                    btn.classList.remove('wrong');
+                    playQuestion();
+                }, 1000);
+            }
+            document.getElementById('score').textContent = `当前等级：${selfChallengeWords.length > 0 ? '自我挑战' : levelData[currentLevel].name} 分数：${score}`;
+        }
+
+        function getWrongOptions(correct, level) {
+            const wrongs = [];
+            // 从本级错误池和相邻等级随机选取
+            const pool = levelData[level].wrongPool.concat(
+                level > 1 ? levelData[level - 1].wrongPool : []
+            ).filter(opt => opt !== correct);
+            while (wrongs.length < 2 && pool.length > 0) {
+                const randomIndex = Math.floor(Math.random() * pool.length);
+                wrongs.push(pool[randomIndex]);
+                pool.splice(randomIndex, 1); // 避免重复
+            }
+            return wrongs;
+        }
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function changeBackground(level) {
+            const bg = levelData[level].bgColor;
+            document.body.style.backgroundImage = `linear-gradient(135deg, ${bg[0]} 25%, ${bg[1]} 100%)`;
+            document.body.style.animation = 'gradient 15s ease infinite';
+            document.body.style.backgroundSize = '400% 400%';
+        }
+
+        function playClickSound() {
+            const clickSound = document.getElementById('clickSound');
+            clickSound.currentTime = 0;
+            clickSound.play();
+        }
+
+        function goBackToWelcome() {
+            document.getElementById('welcome-screen').style.display = 'flex';
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('victory-screen').style.display = 'none';
+            document.getElementById('self-challenge-screen').style.display = 'none';
+            document.getElementById('bgMusic').pause();
+        }
+
+        function goBackToWelcomeFromSelfChallenge() {
+            document.getElementById('welcome-screen').style.display = 'flex';
+            document.getElementById('self-challenge-screen').style.display = 'none';
+            localStorage.setItem('selfChallengeWords', JSON.stringify(selfChallengeWords));
+        }
+
+        function showVictoryScreen() {
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('victory-screen').style.display = 'flex';
+            document.getElementById('bgMusic').pause();
+            document.getElementById('victorySound').play();
+            const encouragements = [
+                "干得漂亮！你太棒了！Well done! You're amazing!",
+                "太厉害了！继续保持！Great job! Keep it up!",
+                "出色的表现！再接再厉！Excellent performance! Keep going!",
+                "你真是个天才！太牛了！You're a genius! Awesome!",
+                "你的努力得到了回报！干得好！Your hard work pays off! Well done!"
+            ];
+            const randomIndex = Math.floor(Math.random() * encouragements.length);
+            document.querySelector('.encouragement-text').textContent = encouragements[randomIndex];
+        }
+
+        function restartGame() {
+            document.getElementById('welcome-screen').style.display = 'flex';
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('victory-screen').style.display = 'none';
+            document.getElementById('self-challenge-screen').style.display = 'none';
+            currentLevel = 0;
+            score = 0;
+            questions = [];
+            currentQuestion = 0;
+            // 移除清空 selfChallengeWords 和 localStorage 中数据的代码
+            document.getElementById('bgMusic').pause();
+        }
+
+        function showSelfChallengeScreen() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('self-challenge-screen').style.display = 'flex';
+            renderWordList();
+        }
+
+        function addSelfChallengeWord() {
+            const chineseWord = document.getElementById('chinese-word').value;
+            const pinyin = document.getElementById('pinyin').value;
+            const meaning = document.getElementById('meaning').value;
+
+            if (chineseWord && pinyin && meaning) {
+                selfChallengeWords.push({
+                    chinese: chineseWord,
+                    pinyin: pinyin,
+                    meaning: meaning,
+                    options: shuffle([meaning, ...getRandomWrongOptions(meaning)])
+                });
+                document.getElementById('chinese-word').value = '';
+                document.getElementById('pinyin').value = '';
+                document.getElementById('meaning').value = '';
+                renderWordList();
+                localStorage.setItem('selfChallengeWords', JSON.stringify(selfChallengeWords));
+            }
+        }
+
+        function getRandomWrongOptions(correct) {
+            const allWrongPools = Object.values(levelData).flatMap(level => level.wrongPool);
+            const wrongs = [];
+            const pool = allWrongPools.filter(opt => opt !== correct);
+            while (wrongs.length < 2 && pool.length > 0) {
+                const randomIndex = Math.floor(Math.random() * pool.length);
+                wrongs.push(pool[randomIndex]);
+                pool.splice(randomIndex, 1);
+            }
+            return wrongs;
+        }
+
+        function startSelfChallengeGame() {
+            if (selfChallengeWords.length === 0) {
+                alert('请先添加词汇！');
+                return;
+            }
+            document.getElementById('self-challenge-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            score = 0;
+            currentQuestion = 0;
+            changeBackground(1); // 默认使用初等等级的背景色
+            playQuestion();
+            document.getElementById('bgMusic').play();
+        }
+
+        function renderWordList() {
+            const wordList = document.getElementById('word-list');
+            wordList.innerHTML = '';
+            selfChallengeWords.forEach((word, index) => {
+                const wordItem = document.createElement('div');
+                wordItem.classList.add('word-item');
+                wordItem.innerHTML = `
+                    <span>${word.chinese} - ${word.pinyin} - ${word.meaning}</span>
+                    <div>
+                        <button class="edit-btn" onclick="editWord(${index}); playClickSound()">编辑</button>
+                        <button class="delete-btn" onclick="deleteWord(${index}); playClickSound()">删除</button>
+                    </div>
+                `;
+                wordList.appendChild(wordItem);
+            });
+        }
+
+        function editWord(index) {
+            const word = selfChallengeWords[index];
+            document.getElementById('chinese-word').value = word.chinese;
+            document.getElementById('pinyin').value = word.pinyin;
+            document.getElementById('meaning').value = word.meaning;
+            selfChallengeWords.splice(index, 1);
+            renderWordList();
+            localStorage.setItem('selfChallengeWords', JSON.stringify(selfChallengeWords));
+        }
+
+        function deleteWord(index) {
+            selfChallengeWords.splice(index, 1);
+            renderWordList();
+            localStorage.setItem('selfChallengeWords', JSON.stringify(selfChallengeWords));
+        }
+    </script>
+</body>
+
+</html>    

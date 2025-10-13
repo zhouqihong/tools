@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉字听写挑战 - 国际中文教育</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        header {
+            background: linear-gradient(90deg, #d31027, #ea384d);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #4b6cb7, #182848);
+            border-radius: 15px;
+            padding: 18px 25px;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            min-width: 150px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .info-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .info-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        
+        .info-box .value {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        
+        .game-area {
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .question-area {
+            width: 100%;
+            background: linear-gradient(135deg, #f5f7fa, #e4e7eb);
+            border-radius: 18px;
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .question-text {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .question-pinyin {
+            font-size: 1.8rem;
+            color: #e74c3c;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .question-meaning {
+            font-size: 1.4rem;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .audio-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .audio-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .audio-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .audio-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .answer-area {
+            width: 100%;
+            background: white;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-weight: 500;
+            text-align: left;
+        }
+        
+        .answer-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.8rem;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .answer-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+        
+        .controls {
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .difficulty-selector {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .difficulty-btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .difficulty-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 16px 35px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .btn-tertiary {
+            background: linear-gradient(135deg, #f39c12, #d35400);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .feedback {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.6rem;
+            font-weight: 500;
+            text-align: center;
+            display: none;
+            width: 100%;
+        }
+        
+        .correct {
+            background: rgba(46, 204, 113, 0.2);
+            border: 2px solid #2ecc71;
+            color: #27ae60;
+        }
+        
+        .incorrect {
+            background: rgba(231, 76, 60, 0.2);
+            border: 2px solid #e74c3c;
+            color: #c0392b;
+        }
+        
+        .character-display {
+            font-size: 3.5rem;
+            margin: 20px 0;
+            color: #2c3e50;
+            font-weight: bold;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: #ecf0f1;
+            height: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2c3e50);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .difficulty-selector {
+                justify-content: center;
+            }
+            
+            .action-btns {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .question-text {
+                font-size: 1.6rem;
+            }
+            
+            .question-pinyin {
+                font-size: 1.4rem;
+            }
+            
+            .question-meaning {
+                font-size: 1.2rem;
+            }
+        }
+        
+        .streak-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff9a00, #ff5e00);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tone-mark {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #e74c3c;
+            color: white;
+            text-align: center;
+            line-height: 25px;
+            font-size: 0.9rem;
+            margin: 0 2px;
+        }
+        
+        .tone-1 { background: #e74c3c; }
+        .tone-2 { background: #f39c12; }
+        .tone-3 { background: #27ae60; }
+        .tone-4 { background: #3498db; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>汉字听写挑战</h1>
+            <div class="subtitle">国际中文教育 · 测试你的汉语听力与书写能力</div>
+            <div class="streak-counter">
+                <i class="fas fa-fire"></i> <span id="streak">0</span> 连续正确
+            </div>
+        </header>
+        
+        <div class="game-info">
+            <div class="info-box">
+                <h3>当前分数</h3>
+                <div class="value" id="score">0</div>
+            </div>
+            <div class="info-box">
+                <h3>剩余时间</h3>
+                <div class="value" id="timer">30</div>
+            </div>
+            <div class="info-box">
+                <h3>当前难度</h3>
+                <div class="value" id="difficulty">中级</div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="question-area">
+                <div class="question-text" id="questionText">请点击播放按钮听写词语</div>
+                <div class="question-pinyin" id="questionPinyin"></div>
+                <div class="question-meaning" id="questionMeaning"></div>
+                
+                <div class="audio-controls">
+                    <button class="audio-btn" id="playBtn">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="audio-btn" id="repeatBtn">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 100%"></div>
+            </div>
+            
+            <div class="answer-area">
+                <div class="input-group">
+                    <label for="answerInput">请在下方输入你听到的词语/句子：</label>
+                    <input type="text" id="answerInput" class="answer-input" placeholder="输入汉字..." autocomplete="off">
+                </div>
+                
+                <div class="character-display" id="characterDisplay"></div>
+                
+                <div class="feedback correct" id="correctFeedback">
+                    <i class="fas fa-check-circle"></i> 正确！+20分
+                </div>
+                
+                <div class="feedback incorrect" id="incorrectFeedback">
+                    <i class="fas fa-times-circle"></i> 不正确，正确答案: <span id="correctAnswer"></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="difficulty-selector">
+                <div class="difficulty-btn active" data-level="easy">初级</div>
+                <div class="difficulty-btn" data-level="medium">中级</div>
+                <div class="difficulty-btn" data-level="hard">高级</div>
+            </div>
+            
+            <div class="action-btns">
+                <button class="btn btn-tertiary" id="hintBtn">
+                    <i class="fas fa-lightbulb"></i> 显示提示
+                </button>
+                <button class="btn btn-secondary" id="skipBtn">
+                    <i class="fas fa-forward"></i> 跳过
+                </button>
+                <button class="btn btn-primary" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> 提交答案
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏数据 - 包含不同难度的词语和句子
+        const gameData = {
+            easy: [
+                { audio: "你好", pinyin: "Nǐ hǎo", meaning: "Hello", english: "Hello" },
+                { audio: "谢谢", pinyin: "Xièxie", meaning: "Thank you", english: "Thank you" },
+                { audio: "再见", pinyin: "Zàijiàn", meaning: "Goodbye", english: "Goodbye" },
+                { audio: "中国", pinyin: "Zhōngguó", meaning: "China", english: "China" },
+                { audio: "朋友", pinyin: "Péngyǒu", meaning: "Friend", english: "Friend" },
+                { audio: "老师", pinyin: "Lǎoshī", meaning: "Teacher", english: "Teacher" },
+                { audio: "学生", pinyin: "Xuéshēng", meaning: "Student", english: "Student" },
+                { audio: "早上好", pinyin: "Zǎoshang hǎo", meaning: "Good morning", english: "Good morning" }
+            ],
+            medium: [
+                { audio: "图书馆", pinyin: "Túshū guǎn", meaning: "Library", english: "Library" },
+                { audio: "大学生", pinyin: "Dàxuéshēng", meaning: "University student", english: "University student" },
+                { audio: "汉语难", pinyin: "Hànyǔ nán", meaning: "Chinese is difficult", english: "Chinese is difficult" },
+                { audio: "我喜欢茶", pinyin: "Wǒ xǐhuān chá", meaning: "I like tea", english: "I like tea" },
+                { audio: "今天天气很好", pinyin: "Jīntiān tiānqì hěn hǎo", meaning: "The weather is nice today", english: "The weather is nice today" },
+                { audio: "你叫什么名字", pinyin: "Nǐ jiào shénme míngzì", meaning: "What is your name?", english: "What is your name?" },
+                { audio: "我会说汉语", pinyin: "Wǒ huì shuō Hànyǔ", meaning: "I can speak Chinese", english: "I can speak Chinese" },
+                { audio: "我要去学校", pinyin: "Wǒ yào qù xuéxiào", meaning: "I want to go to school", english: "I want to go to school" }
+            ],
+            hard: [
+                { audio: "环境保护", pinyin: "Huánjìng bǎohù", meaning: "Environmental protection", english: "Environmental protection" },
+                { audio: "科技创新", pinyin: "Kējì chuàngxīn", meaning: "Technological innovation", english: "Technological innovation" },
+                { audio: "经济发展", pinyin: "Jīngjì fāzhǎn", meaning: "Economic development", english: "Economic development" },
+                { audio: "文化差异", pinyin: "Wénhuà chāyì", meaning: "Cultural differences", english: "Cultural differences" },
+                { audio: "学无止境", pinyin: "Xué wú zhǐ jìng", meaning: "Knowledge has no limit", english: "Knowledge has no limit", isIdiom: true },
+                { audio: "明天我要参加中文考试", pinyin: "Míngtiān wǒ yào cānjiā Zhōngwén kǎoshì", meaning: "Tomorrow I will take a Chinese exam", english: "Tomorrow I will take a Chinese exam" },
+                { audio: "中国有五千年的历史", pinyin: "Zhōngguó yǒu wǔ qiān nián de lìshǐ", meaning: "China has five thousand years of history", english: "China has five thousand years of history" },
+                { audio: "北京是中国的首都", pinyin: "Běijīng shì Zhōngguó de shǒudū", meaning: "Beijing is the capital of China", english: "Beijing is the capital of China" }
+            ]
+        };
+
+        // 游戏状态
+        let currentQuestion = null;
+        let score = 0;
+        let streak = 0;
+        let timeLeft = 30;
+        let timer = null;
+        let currentDifficulty = "medium";
+        let synth = window.speechSynthesis;
+
+        // DOM元素
+        const questionText = document.getElementById('questionText');
+        const questionPinyin = document.getElementById('questionPinyin');
+        const questionMeaning = document.getElementById('questionMeaning');
+        const playBtn = document.getElementById('playBtn');
+        const repeatBtn = document.getElementById('repeatBtn');
+        const answerInput = document.getElementById('answerInput');
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const difficultyElement = document.getElementById('difficulty');
+        const submitBtn = document.getElementById('submitBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const correctFeedback = document.getElementById('correctFeedback');
+        const incorrectFeedback = document.getElementById('incorrectFeedback');
+        const correctAnswer = document.getElementById('correctAnswer');
+        const progressBar = document.getElementById('progressBar');
+        const streakElement = document.getElementById('streak');
+        const characterDisplay = document.getElementById('characterDisplay');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+
+        // 初始化游戏
+        function initGame() {
+            clearInterval(timer);
+            score = 0;
+            streak = 0;
+            scoreElement.textContent = score;
+            streakElement.textContent = streak;
+            loadQuestion();
+            startTimer();
+        }
+
+        // 加载问题
+        function loadQuestion() {
+            const questions = gameData[currentDifficulty];
+            const randomIndex = Math.floor(Math.random() * questions.length);
+            currentQuestion = questions[randomIndex];
+            
+            // 重置UI
+            questionText.textContent = "准备听写...";
+            questionPinyin.textContent = "";
+            questionMeaning.textContent = "";
+            answerInput.value = "";
+            answerInput.disabled = false;
+            correctFeedback.style.display = "none";
+            incorrectFeedback.style.display = "none";
+            characterDisplay.textContent = "";
+            
+            // 设置时间
+            timeLeft = currentDifficulty === "easy" ? 40 : 
+                      currentDifficulty === "medium" ? 30 : 25;
+            timerElement.textContent = timeLeft;
+            progressBar.style.width = "100%";
+            
+            // 播放音频
+            playAudio();
+        }
+
+        // 播放音频
+        function playAudio() {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(currentQuestion.audio);
+            utterance.lang = 'zh-CN';
+            utterance.rate = currentDifficulty === "easy" ? 0.8 : 
+                             currentDifficulty === "medium" ? 1 : 1.2;
+            
+            synth.speak(utterance);
+            
+            utterance.onend = function() {
+                questionText.textContent = "你听到了什么？";
+            };
+        }
+
+        // 显示提示
+        function showHint() {
+            // 显示拼音
+            questionPinyin.textContent = currentQuestion.pinyin;
+            
+            // 显示含义
+            questionMeaning.textContent = currentQuestion.meaning;
+            
+            // 扣分
+            score = Math.max(0, score - 5);
+            scoreElement.textContent = score;
+            
+            // 禁用提示按钮
+            hintBtn.disabled = true;
+            setTimeout(() => {
+                hintBtn.disabled = false;
+            }, 3000);
+        }
+
+        // 检查答案
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim();
+            if (!userAnswer) return;
+            
+            answerInput.disabled = true;
+            
+            if (userAnswer === currentQuestion.audio) {
+                // 正确答案
+                correctFeedback.style.display = "block";
+                
+                // 加分
+                let points = 20;
+                if (streak >= 3) points += 10; // 连续正确奖励
+                score += points;
+                streak++;
+                
+                scoreElement.textContent = score;
+                streakElement.textContent = streak;
+                
+                // 显示汉字动画
+                characterDisplay.textContent = currentQuestion.audio;
+                characterDisplay.style.color = "#27ae60";
+                
+                // 加载下一个问题
+                setTimeout(loadQuestion, 2000);
+            } else {
+                // 错误答案
+                incorrectFeedback.style.display = "block";
+                correctAnswer.textContent = currentQuestion.audio;
+                streak = 0;
+                streakElement.textContent = streak;
+                
+                // 显示汉字动画
+                characterDisplay.textContent = currentQuestion.audio;
+                characterDisplay.style.color = "#c0392b";
+                
+                // 加载下一个问题
+                setTimeout(loadQuestion, 3000);
+            }
+        }
+
+        // 计时器
+        function startTimer() {
+            clearInterval(timer);
+            const startTime = Date.now();
+            const totalTime = timeLeft;
+            
+            timer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                timeLeft = totalTime - elapsed;
+                timerElement.textContent = timeLeft;
+                
+                // 更新进度条
+                const progress = (timeLeft / totalTime) * 100;
+                progressBar.style.width = `${progress}%`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    answerInput.disabled = true;
+                    incorrectFeedback.style.display = "block";
+                    correctAnswer.textContent = currentQuestion.audio;
+                    streak = 0;
+                    streakElement.textContent = streak;
+                    
+                    // 显示汉字动画
+                    characterDisplay.textContent = currentQuestion.audio;
+                    characterDisplay.style.color = "#c0392b";
+                    
+                    setTimeout(loadQuestion, 3000);
+                }
+            }, 1000);
+        }
+
+        // 设置难度
+        function setDifficulty(level) {
+            currentDifficulty = level;
+            difficultyElement.textContent = 
+                level === "easy" ? "初级" : 
+                level === "medium" ? "中级" : "高级";
+            
+            // 更新按钮状态
+            difficultyBtns.forEach(btn => {
+                if (btn.dataset.level === level) {
+                    btn.classList.add("active");
+                } else {
+                    btn.classList.remove("active");
+                }
+            });
+            
+            // 重置游戏
+            initGame();
+        }
+
+        // 事件监听
+        playBtn.addEventListener("click", playAudio);
+        repeatBtn.addEventListener("click", playAudio);
+        submitBtn.addEventListener("click", checkAnswer);
+        hintBtn.addEventListener("click", showHint);
+        skipBtn.addEventListener("click", loadQuestion);
+        
+        answerInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                checkAnswer();
+            }
+        });
+        
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                setDifficulty(btn.dataset.level);
+            });
+        });
+
+        // 启动游戏
+        setDifficulty("medium");
+    </script>
+</body>
+</html>
