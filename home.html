@@ -318,6 +318,25 @@
       </div>
     </section>
 
+    <!-- Coze智能体AI助手 -->
+    <section id="coze-assistant" aria-label="Coze智能体AI助手" style="margin-top:22px">
+      <div class="hero" style="padding:18px">
+        <h2 style="margin-top:0" id="cozeTitle">Coze智能体AI助手</h2>
+        <div class="tip" style="margin:6px 0 12px" id="cozeDesc">
+          点击下方按钮跳转到Coze平台上的智能体，获取更多AI助手功能。
+        </div>
+
+        <div class="coze-panel" role="region" aria-label="Coze智能体跳转" style="display:grid;gap:12px;margin-top:8px">
+          <a href="https://www.coze.cn/store/agent/7527263210446045225" target="_blank" class="btn icon-btn" style="justify-content:center;font-size:1.1rem;padding:12px 20px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span id="cozeButtonText">点击跳转到智能体</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <footer id="footer">
       © 2025 国际中文教育辅助学习AI助手 1.0 ·  反馈：695790187@qq.com
     </footer>
@@ -386,7 +405,10 @@
         send: "发送",
         clear: "清空",
         footer: "© 2025 国际中文教育辅助学习AI助手 1.0 · 反馈：695790187@qq.com",
-        resultCount: "个匹配结果"
+        resultCount: "个匹配结果",
+        cozeTitle: "Coze智能体AI助手",
+        cozeDesc: "点击下方按钮跳转到Coze平台上的智能体，获取更多AI助手功能。",
+        cozeButton: "点击跳转到智能体"
       },
       en: {
         heroTitle: "International Chinese Education Assistant 1.0",
@@ -406,7 +428,10 @@
         send: "Send",
         clear: "Clear",
         footer: "© 2025 International Chinese Education Assistant 1.0 · Desktop & Mobile Compatible · Feedback: Course Group/Email",
-        resultCount: "matching results"
+        resultCount: "matching results",
+        cozeTitle: "Coze Agent AI Assistant",
+        cozeDesc: "Click the button below to jump to the agent on the Coze platform for more AI assistant functions.",
+        cozeButton: "Click to jump to the agent"
       }
     };
     
@@ -450,6 +475,11 @@
       document.querySelector('#chatSend').lastChild.textContent = ' ' + t.send;
       document.getElementById('chatClear').textContent = t.clear;
       
+      // Update Coze section
+      document.getElementById('cozeTitle').textContent = t.cozeTitle;
+      document.getElementById('cozeDesc').textContent = t.cozeDesc;
+      document.getElementById('cozeButtonText').textContent = t.cozeButton;
+      
       // Update footer
       document.getElementById('footer').innerHTML = t.footer;
       
@@ -474,7 +504,7 @@
   const DS_MODEL = "deepseek-chat";            // fixed model
   const DS_KEY   = "sk-03543c891dbc4c2b84bf8eec9e8b0e89"; // Your API key
 
-  const SYSTEM_PROMPT = "你是一个正在学习汉语的国际学生（与 HSK/HSKK/IB 中文课程对接）。请用简洁自然的中文进行对话，务必要附上拼音和简短英文解释，避免一次性给出过多信息，并鼓励继续交流。";
+  const SYSTEM_PROMPT = "你是一个正在学习汉语的国际学生（与 HSK/HSKK/IB 中文课程对接）。请用简洁自然的中文进行对话，请一定要附上拼音和简短英文解释，避免一次性给出过多信息，并鼓励继续交流。";
   const chatBox = document.getElementById('chatMessages');
   const chatForm = document.getElementById('chatForm');
   const chatInput = document.getElementById('chatInput');
