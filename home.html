@@ -109,6 +109,23 @@
     /* ---------- Footer ---------- */
     footer{margin: 28px 0 14px;color:var(--muted);font-size:.9rem;text-align:center}
 
+    /* ---------- Visitor Counter ---------- */
+    .visitor-counter {
+      text-align: center;
+      margin: 30px 0 20px;
+      padding: 16px;
+      background: var(--glass);
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .visitor-count {
+      font-weight: 700;
+      color: var(--brand-2);
+      font-size: 1.1rem;
+    }
+
     /* ---------- Utilities ---------- */
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
   </style>
@@ -337,6 +354,32 @@
       </div>
     </section>
 
+    <!-- 中文写作批改AI助手 -->
+    <section id="writing-assistant" aria-label="中文写作批改AI助手" style="margin-top:22px">
+      <div class="hero" style="padding:18px">
+        <h2 style="margin-top:0" id="writingTitle">中文写作批改AI助手</h2>
+        <div class="tip" style="margin:6px 0 12px" id="writingDesc">
+          点击下方按钮跳转到Coze平台上的中文写作批改AI助手，获取专业的写作批改与改进建议。
+        </div>
+
+        <div class="writing-panel" role="region" aria-label="中文写作批改AI助手跳转" style="display:grid;gap:12px;margin-top:8px">
+          <a href="https://www.coze.cn/s/o7Ps0F2w50U/" target="_blank" class="btn icon-btn" style="justify-content:center;font-size:1.1rem;padding:12px 20px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span id="writingButtonText">点击跳转到中文写作批改AI助手</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visitor Counter -->
+    <div class="visitor-counter">
+      <span id="visitorText">本站总访问人数：</span>
+      <span class="visitor-count" id="visitCount">0</span>
+      <span id="visitorUnit"> 人</span>
+    </div>
+
     <footer id="footer">
       © 2025 国际中文教育辅助学习AI助手 1.0 ·  反馈：695790187@qq.com
     </footer>
@@ -349,6 +392,17 @@
       const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
       const theme = stored || (prefersLight ? 'light' : 'dark');
       document.documentElement.setAttribute('data-theme', theme);
+    })();
+
+    // ---------- Visitor Counter ----------
+    (function initVisitorCounter() {
+      let count = localStorage.getItem('visitorCount');
+      if (!count) {
+        count = 0;
+      }
+      count = parseInt(count) + 1;
+      localStorage.setItem('visitorCount', count);
+      document.getElementById('visitCount').textContent = count.toLocaleString();
     })();
 
     // ---------- Controls ----------
@@ -408,7 +462,12 @@
         resultCount: "个匹配结果",
         cozeTitle: "Coze智能体AI助手",
         cozeDesc: "点击下方按钮跳转到Coze平台上的智能体，获取更多AI助手功能。",
-        cozeButton: "点击跳转到智能体"
+        cozeButton: "点击跳转到智能体",
+        writingTitle: "中文写作批改AI助手",
+        writingDesc: "点击下方按钮跳转到Coze平台上的中文写作批改AI助手，获取专业的写作批改与改进建议。",
+        writingButton: "点击跳转到中文写作批改AI助手",
+        visitorText: "本站总访问人数：",
+        visitorUnit: " 人"
       },
       en: {
         heroTitle: "International Chinese Education Assistant 1.0",
@@ -431,7 +490,12 @@
         resultCount: "matching results",
         cozeTitle: "Coze Agent AI Assistant",
         cozeDesc: "Click the button below to jump to the agent on the Coze platform for more AI assistant functions.",
-        cozeButton: "Click to jump to the agent"
+        cozeButton: "Click to jump to the agent",
+        writingTitle: "Chinese Writing Correction AI Assistant",
+        writingDesc: "Click the button below to jump to the Chinese Writing Correction AI Assistant on the Coze platform for professional writing correction and improvement suggestions.",
+        writingButton: "Click to jump to Chinese Writing Correction AI Assistant",
+        visitorText: "Total Visitors: ",
+        visitorUnit: " people"
       }
     };
     
@@ -479,6 +543,15 @@
       document.getElementById('cozeTitle').textContent = t.cozeTitle;
       document.getElementById('cozeDesc').textContent = t.cozeDesc;
       document.getElementById('cozeButtonText').textContent = t.cozeButton;
+      
+      // Update Writing section
+      document.getElementById('writingTitle').textContent = t.writingTitle;
+      document.getElementById('writingDesc').textContent = t.writingDesc;
+      document.getElementById('writingButtonText').textContent = t.writingButton;
+      
+      // Update visitor counter
+      document.getElementById('visitorText').textContent = t.visitorText;
+      document.getElementById('visitorUnit').textContent = t.visitorUnit;
       
       // Update footer
       document.getElementById('footer').innerHTML = t.footer;
