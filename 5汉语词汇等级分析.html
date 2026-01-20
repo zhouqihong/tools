@@ -1,723 +1,715 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>汉语词汇等级分析器</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-        }
-        
-        header {
-            background: linear-gradient(to right, #3498db, #2c3e50);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        
-        .main-content {
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-        
-        .input-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-        
-        .input-group {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        input[type="text"] {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #e1e5eb;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-        
-        input[type="text"]:focus {
-            border-color: #3498db;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-        
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 0 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        button:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .levels-info {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-        
-        .level-tag {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        
-        .beginner-tag {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        
-        .intermediate-tag {
-            background: #fff8e1;
-            color: #ff8f00;
-        }
-        
-        .advanced-tag {
-            background: #ffebee;
-            color: #c62828;
-        }
-        
-        #result {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            display: none;
-            animation: fadeIn 0.6s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .word-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .word {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #2c3e50;
-        }
-        
-        .level-badge {
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        
-        .beginner {
-            background: #4caf50;
-            color: white;
-        }
-        
-        .intermediate {
-            background: #ffc107;
-            color: #333;
-        }
-        
-        .advanced {
-            background: #f44336;
-            color: white;
-        }
-        
-        .meaning {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            line-height: 1.8;
-        }
-        
-        .example {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-            margin-top: 20px;
-            font-style: italic;
-        }
-        
-        .example strong {
-            color: #3498db;
-        }
-        
-        .add-section {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px dashed #ddd;
-        }
-        
-        .add-section h3 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-        
-        .add-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .add-form input, .add-form select {
-            padding: 12px;
-            border: 2px solid #e1e5eb;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        
-        .add-form button {
-            grid-column: span 2;
-            padding: 12px;
-        }
-        
-        .suggestions {
-            margin-top: 30px;
-        }
-        
-        .suggestions h3 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-        
-        .suggested-words {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .word-chip {
-            padding: 8px 15px;
-            background: #e1f5fe;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .word-chip:hover {
-            background: #b3e5fc;
-            transform: translateY(-2px);
-        }
-        
-        .level-description {
-            margin-top: 25px;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        
-        .level-description h3 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-        
-        .level-info {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .level-box {
-            flex: 1;
-            padding: 15px;
-            border-radius: 8px;
-            color: white;
-        }
-        
-        .beginner-box {
-            background: linear-gradient(to right, #4caf50, #81c784);
-        }
-        
-        .intermediate-box {
-            background: linear-gradient(to right, #ffc107, #ffd54f);
-        }
-        
-        .advanced-box {
-            background: linear-gradient(to right, #f44336, #ef5350);
-        }
-        
-        .level-box h4 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: #2c3e50;
-            color: #ecf0f1;
-            font-size: 0.9rem;
-        }
-        
-        @media (max-width: 768px) {
-            .input-group {
-                flex-direction: column;
-            }
-            
-            button {
-                width: 100%;
-                padding: 15px;
-            }
-            
-            .add-form {
-                grid-template-columns: 1fr;
-            }
-            
-            .add-form button {
-                grid-column: span 1;
-            }
-            
-            .level-info {
-                flex-direction: column;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>汉语词汇等级分析器（离线可用）</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container{
+      width: 100%;
+      max-width: 900px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+    header{
+      background: linear-gradient(to right, #3498db, #2c3e50);
+      color: #fff;
+      padding: 30px 20px;
+      text-align: center;
+    }
+    h1{ font-size: 2.3rem; margin-bottom: 10px; }
+    .subtitle{ font-size: 1.1rem; opacity: .95; max-width: 760px; margin: 0 auto; }
+    .main-content{
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .input-section{
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 22px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .input-group{
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    input[type="text"]{
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #e1e5eb;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      transition: all .2s ease;
+    }
+    input[type="text"]:focus{
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(52,152,219,0.2);
+    }
+    button{
+      background: #3498db;
+      color: #fff;
+      border: none;
+      padding: 0 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.02rem;
+      font-weight: 650;
+      transition: all .2s ease;
+      white-space: nowrap;
+    }
+    button:hover{
+      background: #2980b9;
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .levels-info{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    .level-tag{
+      padding: 8px 15px;
+      border-radius: 999px;
+      font-size: .9rem;
+      font-weight: 650;
+    }
+    .beginner-tag{ background:#e8f5e9; color:#2e7d32; }
+    .intermediate-tag{ background:#fff8e1; color:#ff8f00; }
+    .advanced-tag{ background:#ffebee; color:#c62828; }
+
+    #statusBar{
+      margin-top: 12px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      font-size:.95rem;
+      color:#2c3e50;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#eef3f8;
+      border: 1px solid #dde6f0;
+    }
+    .dot{ width:10px; height:10px; border-radius:50%; background:#999; }
+    .dot.ok{ background:#2ecc71; }
+    .dot.warn{ background:#f1c40f; }
+    .dot.bad{ background:#e74c3c; }
+
+    .loader-row{
+      margin-top: 12px;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .file-btn{
+      background:#27ae60;
+    }
+    .file-btn:hover{ background:#1e8f4f; }
+    .small{
+      font-size:.9rem;
+      color:#556;
+      text-align:center;
+      margin-top:8px;
+    }
+    .hidden{ display:none !important; }
+
+    #result{
+      background:#fff;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      display:none;
+      animation: fadeIn .45s ease;
+    }
+    @keyframes fadeIn{
+      from{ opacity:0; transform: translateY(8px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+    .word-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #eee;
+      flex-wrap:wrap;
+    }
+    .word{
+      font-size: 2.1rem;
+      font-weight: 750;
+      color:#2c3e50;
+    }
+    .level-badge{
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 750;
+    }
+    .beginner{ background:#4caf50; color:#fff; }
+    .intermediate{ background:#ffc107; color:#333; }
+    .advanced{ background:#f44336; color:#fff; }
+
+    .meaning{
+      font-size: 1.08rem;
+      margin-bottom: 10px;
+      line-height: 1.8;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap: 8px 12px;
+      margin-top: 12px;
+    }
+    .k{ color:#60748a; font-weight:650; }
+    .v{ color:#2c3e50; word-break: break-word; }
+
+    .example{
+      background:#f8f9fa;
+      padding: 14px;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+      margin-top: 14px;
+      font-style: italic;
+    }
+    .example strong{ color:#3498db; font-style: normal; }
+
+    .unknown-result h3{ margin-bottom:8px; color:#2c3e50; }
+    .unknown-result p{ color:#556; }
+
+    .add-section{
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px dashed #ddd;
+    }
+    .add-section h3{ margin-bottom:10px; color:#2c3e50; }
+    .muted{ color:#60748a; font-size:.95rem; }
+    .add-form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .add-form input, .add-form select{
+      padding: 12px;
+      border: 2px solid #e1e5eb;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .add-form button{
+      grid-column: span 2;
+      padding: 12px;
+      background:#8e44ad;
+    }
+    .add-form button:hover{ background:#6d2f86; }
+
+    .suggestions h3{ margin-bottom: 12px; color:#2c3e50; }
+    .suggested-words{ display:flex; flex-wrap:wrap; gap:10px; }
+    .word-chip{
+      padding: 8px 15px;
+      background:#e1f5fe;
+      border-radius: 999px;
+      cursor:pointer;
+      transition: all .15s ease;
+      user-select:none;
+    }
+    .word-chip:hover{
+      background:#b3e5fc;
+      transform: translateY(-1px);
+    }
+
+    .level-description{
+      background:#f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .level-description h3{ margin-bottom: 12px; color:#2c3e50; }
+    .level-info{ display:flex; gap: 15px; margin-top: 15px; }
+    .level-box{
+      flex:1;
+      padding: 15px;
+      border-radius: 8px;
+      color:#fff;
+    }
+    .beginner-box{ background: linear-gradient(to right, #4caf50, #81c784); }
+    .intermediate-box{ background: linear-gradient(to right, #ffc107, #ffd54f); color:#333; }
+    .advanced-box{ background: linear-gradient(to right, #f44336, #ef5350); }
+
+    footer{
+      text-align:center;
+      padding: 20px;
+      background:#2c3e50;
+      color:#ecf0f1;
+      font-size: .9rem;
+    }
+
+    @media (max-width:768px){
+      .input-group{ flex-direction:column; }
+      button{ width:100%; padding: 14px; }
+      .add-form{ grid-template-columns: 1fr; }
+      .add-form button{ grid-column: span 1; }
+      .level-info{ flex-direction:column; }
+      .kv{ grid-template-columns: 90px 1fr; }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>汉语词汇等级分析器</h1>
-            <p class="subtitle">输入汉语词汇，分析其HSK等级并获取详细词义解释，支持3000+常用词汇分析</p>
-        </header>
-        
-        <div class="main-content">
-            <div class="input-section">
-                <div class="input-group">
-                    <input type="text" id="wordInput" placeholder="输入汉语词汇（如：你好、学习、文化、改革开放）">
-                    <button onclick="analyzeWord()">分析词汇</button>
-                </div>
-                
-                <div class="levels-info">
-                    <div class="level-tag beginner-tag">初级 (HSK 1-3)</div>
-                    <div class="level-tag intermediate-tag">中级 (HSK 4-5)</div>
-                    <div class="level-tag advanced-tag">高级 (HSK 6+)</div>
-                </div>
-            </div>
-            
-            <div id="result">
-                <!-- 结果将动态显示在这里 -->
-            </div>
-            
-            <div class="suggestions">
-                <h3>试试这些词汇：</h3>
-                <div class="suggested-words">
-                    <div class="word-chip" onclick="setWord('老师')">老师</div>
-                    <div class="word-chip" onclick="setWord('学生')">学生</div>
-                    <div class="word-chip" onclick="setWord('朋友')">朋友</div>
-                    <div class="word-chip" onclick="setWord('环境')">环境</div>
-                    <div class="word-chip" onclick="setWord('经济')">经济</div>
-                    <div class="word-chip" onclick="setWord('文化')">文化</div>
-                    <div class="word-chip" onclick="setWord('改革开放')">改革开放</div>
-                    <div class="word-chip" onclick="setWord('脱颖而出')">脱颖而出</div>
-                </div>
-            </div>
-            
-            <div class="level-description">
-                <h3>HSK等级说明</h3>
-                <div class="level-info">
-                    <div class="level-box beginner-box">
-                        <h4>初级 (HSK 1-3级)</h4>
-                        <p>掌握600个最常用词语，能进行基本日常生活交流。</p>
-                    </div>
-                    <div class="level-box intermediate-box">
-                        <h4>中级 (HSK 4-5级)</h4>
-                        <p>掌握2500个词语，能较流利地进行交流讨论，阅读较复杂文章。</p>
-                    </div>
-                    <div class="level-box advanced-box">
-                        <h4>高级 (HSK 6级及以上)</h4>
-                        <p>掌握5000+词语，能理解复杂抽象概念，进行专业领域交流。</p>
-                    </div>
-                </div>
-            </div>
+  <div class="container">
+    <header>
+      <h1>汉语词汇等级分析器</h1>
+      <p class="subtitle">
+        本工具支持离线使用：本地双击打开也能加载 <b>词汇2022.json</b>（选择文件即可），并查询“级别/拼音/词性”等信息。
+      </p>
+    </header>
+
+    <div class="main-content">
+      <div class="input-section">
+        <div class="input-group">
+          <input type="text" id="wordInput" placeholder="输入汉语词语（如：爱、阿姨、改革开放）" />
+          <button onclick="analyzeWord()">分析词汇</button>
         </div>
-        
-        <footer>
-            <p>汉语词汇等级分析器 &copy; 2023 | 基于HSK考试大纲词汇表</p>
-        </footer>
+
+        <div class="levels-info">
+          <div class="level-tag beginner-tag">初级（一级–三级）</div>
+          <div class="level-tag intermediate-tag">中级（四级–五级）</div>
+          <div class="level-tag advanced-tag">高级（六级–高等）</div>
+        </div>
+
+        <div id="statusBar">
+          <div class="pill">
+            <span class="dot warn" id="dbDot"></span>
+            <span id="dbStatusText">尚未加载词库</span>
+          </div>
+          <div class="pill">
+            <span>词条数：<b id="dbCount">-</b></span>
+          </div>
+          <div class="pill">
+            <span>模式：<b id="modeText">离线/本地选择</b></span>
+          </div>
+        </div>
+
+        <div class="loader-row">
+          <button class="file-btn" id="pickBtn" type="button">选择词汇2022.json</button>
+          <button id="tryFetchBtn" type="button" title="在 GitHub Pages 等 http(s) 环境下可自动读取同目录 JSON">自动读取（同目录）</button>
+          <input class="hidden" id="fileInput" type="file" accept=".json,application/json" />
+        </div>
+
+        <div class="small" id="hintText">
+          本地双击打开时，请点击“选择词汇2022.json”，并在弹窗中选择同文件夹里的 JSON 文件。
+        </div>
+      </div>
+
+      <div id="result"></div>
+
+      <div class="suggestions">
+        <h3>试试这些词语：</h3>
+        <div class="suggested-words" id="suggestedWords">
+          <div class="word-chip" onclick="setWord('爱')">爱</div>
+          <div class="word-chip" onclick="setWord('阿姨')">阿姨</div>
+          <div class="word-chip" onclick="setWord('安静')">安静</div>
+          <div class="word-chip" onclick="setWord('改革开放')">改革开放</div>
+        </div>
+      </div>
+
+      <div class="level-description">
+        <h3>等级说明</h3>
+        <div class="level-info">
+          <div class="level-box beginner-box">
+            <h4>初级（一级–三级）</h4>
+            <p>满足日常基本交流需求，覆盖高频生活、学习、校园、出行等场景。</p>
+          </div>
+          <div class="level-box intermediate-box">
+            <h4>中级（四级–五级）</h4>
+            <p>可较流利地表达观点、理解较复杂语段，适用于学习与工作交流。</p>
+          </div>
+          <div class="level-box advanced-box">
+            <h4>高级（六级–高等）</h4>
+            <p>覆盖抽象与专业表达，可处理复杂语境与较高难度文本。</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script>
-        // 汉语词汇数据库（包含等级、词义和例句）
-        const vocabularyDB = {
-            // 初级词汇 (HSK 1-3级)
-            "你好": {
-                level: "初级",
-                meaning: "表示问候的常用语，用于打招呼",
-                example: "你好！我叫李明，很高兴认识你。"
-            },
-            "谢谢": {
-                level: "初级",
-                meaning: "表示感谢的用语",
-                example: "谢谢你的帮助，我真的很感激。"
-            },
-            "中国": {
-                level: "初级",
-                meaning: "中华人民共和国，位于东亚的国家",
-                example: "中国有五千多年的悠久历史。"
-            },
-            "学习": {
-                level: "初级",
-                meaning: "通过阅读、听讲、研究等获得知识或技能",
-                example: "我正在学习汉语，已经学了三个月了。"
-            },
-            "老师": {
-                level: "初级",
-                meaning: "传授知识、技能的人，教育工作者",
-                example: "王老师教我们汉语，她很有耐心。"
-            },
-            "学生": {
-                level: "初级",
-                meaning: "在学校或其他教育机构学习的人",
-                example: "这些学生每天都很认真地学习。"
-            },
-            "朋友": {
-                level: "初级",
-                meaning: "彼此有交情的人，比同学、同事关系更亲密",
-                example: "我们是好朋友，经常一起吃饭聊天。"
-            },
-            "今天": {
-                level: "初级",
-                meaning: "说话时的这一天，现在所处的日子",
-                example: "今天天气很好，我们出去走走吧。"
-            },
-            "明天": {
-                level: "初级",
-                meaning: "今天的下一天，未来24小时",
-                example: "明天我要去北京出差。"
-            },
-            "家人": {
-                level: "初级",
-                meaning: "家庭成员，与自己有亲属关系的人",
-                example: "周末我喜欢和家人一起度过。"
-            },
-            "学校": {
-                level: "初级",
-                meaning: "专门进行教育的机构",
-                example: "我的学校在市中心，离我家不远。"
-            },
-            "工作": {
-                level: "初级",
-                meaning: "从事劳动或职业活动",
-                example: "我每天工作八小时。"
-            },
-            "吃饭": {
-                level: "初级",
-                meaning: "进餐，食用饭食",
-                example: "我们一起去吃饭吧，我知道一家好餐厅。"
-            },
-            
-            // 中级词汇 (HSK 4-5级)
-            "沟通": {
-                level: "中级",
-                meaning: "交流思想，使双方能通连",
-                example: "良好的沟通有助于解决问题。"
-            },
-            "环境": {
-                level: "中级",
-                meaning: "周围的地方、情况和条件",
-                example: "我们要保护自然环境。"
-            },
-            "经济": {
-                level: "中级",
-                meaning: "社会物质生产和再生产的活动",
-                example: "这个国家的经济发展很快。"
-            },
-            "社会": {
-                level: "中级",
-                meaning: "由一定的经济基础和上层建筑构成的整体",
-                example: "每个公民都应该为社会做贡献。"
-            },
-            "文化": {
-                level: "中级",
-                meaning: "人类在社会历史发展过程中所创造的物质和精神财富",
-                example: "中国文化博大精深，值得深入研究。"
-            },
-            "传统": {
-                level: "中级",
-                meaning: "世代相传、具有特点的社会因素",
-                example: "春节是中国最重要的传统节日。"
-            },
-            "发展": {
-                level: "中级",
-                meaning: "事物由小到大、由简单到复杂的变化",
-                example: "科学技术发展得很快。"
-            },
-            "复杂": {
-                level: "中级",
-                meaning: "事物的种类、头绪等多而杂",
-                example: "这个问题很复杂，需要仔细研究。"
-            },
-            "竞争": {
-                level: "中级",
-                meaning: "为了自己方面的利益而与人争胜",
-                example: "市场竞争越来越激烈了。"
-            },
-            "建议": {
-                level: "中级",
-                meaning: "向人提出自己的主张或意见",
-                example: "我建议我们明天再讨论这个问题。"
-            },
-            "解释": {
-                level: "中级",
-                meaning: "分析说明，阐明含义、原因、理由等",
-                example: "你能解释一下这个词的意思吗？"
-            },
-            "经历": {
-                level: "中级",
-                meaning: "亲身遇到过、做过或遭受过的事",
-                example: "他在国外工作的经历很有价值。"
-            },
-            
-            // 高级词汇 (HSK 6级及以上)
-            "改革开放": {
-                level: "高级",
-                meaning: "中国自1978年开始的经济和社会改革政策",
-                example: "改革开放以来，中国经济取得了巨大发展。"
-            },
-            "脱颖而出": {
-                level: "高级",
-                meaning: "比喻人的才能全部显露出来",
-                example: "他在众多候选人中脱颖而出，获得了这个职位。"
-            },
-            "可持续发展": {
-                level: "高级",
-                meaning: "既满足当代人需求，又不损害后代人满足其需求的能力的发展模式",
-                example: "保护环境是实现可持续发展的关键。"
-            },
-            "宏观调控": {
-                level: "高级",
-                meaning: "国家对国民经济总体活动进行的调节和控制",
-                example: "政府通过宏观调控稳定了市场价格。"
-            },
-            "实事求是": {
-                level: "高级",
-                meaning: "从实际情况出发，不夸大，不缩小，正确地对待和处理问题",
-                example: "我们应该本着实事求是的精神处理这件事。"
-            },
-            "错综复杂": {
-                level: "高级",
-                meaning: "形容头绪繁多，情况复杂",
-                example: "这个案件的情节错综复杂，需要仔细调查。"
-            },
-            "潜移默化": {
-                level: "高级",
-                meaning: "指人的思想、性格在不知不觉中受到感染、影响而发生变化",
-                example: "环境对人的影响是潜移默化的。"
-            },
-            "不可思议": {
-                level: "高级",
-                meaning: "不可想象，不能理解",
-                example: "现代科技的发展速度简直不可思议。"
-            },
-            "千方百计": {
-                level: "高级",
-                meaning: "想尽或用尽一切办法",
-                example: "医生们千方百计挽救病人的生命。"
-            },
-            "与时俱进": {
-                level: "高级",
-                meaning: "随着时代的发展而不断发展、前进",
-                example: "我们的思想观念应该与时俱进。"
-            },
-            "繁荣昌盛": {
-                level: "高级",
-                meaning: "形容事业蓬勃发展，兴旺发达",
-                example: "祝愿我们的祖国繁荣昌盛。"
-            }
-        };
+    <footer>
+      <p>汉语词汇等级分析器 &copy; 2026 | 支持离线（FileReader）与在线（fetch）双模式</p>
+    </footer>
+  </div>
 
-        // 设置词汇
-        function setWord(word) {
-            document.getElementById('wordInput').value = word;
-            analyzeWord();
+  <script>
+    /***********************
+     * 0) 全局变量
+     ***********************/
+    const DEFAULT_DB_NAME = "词汇2022.json";
+    const DEFAULT_DB_URL = "./" + DEFAULT_DB_NAME;
+
+    let rawList = [];            // 原始数组
+    let indexByWord = new Map(); // 词语 -> entries[]
+    let userAdded = new Map();   // 会话内临时添加
+
+    /***********************
+     * 1) 工具函数
+     ***********************/
+    function normalizeWord(s){ return (s || "").trim(); }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#39;");
+    }
+    function escapeHtmlAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
+
+    function setDbStatus(type, text){
+      const dot = document.getElementById("dbDot");
+      dot.classList.remove("ok","warn","bad");
+      dot.classList.add(type);
+      document.getElementById("dbStatusText").textContent = text;
+    }
+
+    function setModeText(s){
+      document.getElementById("modeText").textContent = s;
+    }
+
+    function buildIndex(list){
+      const m = new Map();
+      for(const row of list){
+        const w = normalizeWord(row["词语"]);
+        if(!w) continue;
+        if(!m.has(w)) m.set(w, []);
+        m.get(w).push(row);
+      }
+      return m;
+    }
+
+    function mergeEntries(word){
+      const a = indexByWord.get(word) || [];
+      const b = userAdded.get(word) || [];
+      return [...a, ...b];
+    }
+
+    function getLevelGroup(levelText){
+      if(!levelText) return { group:"未知", className:"intermediate", label:"未知" };
+      const t = levelText.trim();
+      const beginner = new Set(["一级","二级","三级"]);
+      const mid = new Set(["四级","五级"]);
+      const adv = new Set(["六级","高等"]);
+      if(beginner.has(t)) return { group:"初级", className:"beginner", label:"一级–三级" };
+      if(mid.has(t)) return { group:"中级", className:"intermediate", label:"四级–五级" };
+      if(adv.has(t)) return { group:"高级", className:"advanced", label:"六级–高等" };
+      return { group:"未知", className:"intermediate", label:t };
+    }
+
+    function refreshSuggestions(){
+      const box = document.getElementById("suggestedWords");
+      if(!rawList.length) return;
+
+      const uniq = Array.from(new Set(
+        rawList.map(r => normalizeWord(r["词语"])).filter(Boolean)
+      ));
+
+      const chosen = [];
+      const n = Math.min(10, uniq.length);
+      for(let i=0;i<n;i++){
+        const idx = Math.floor(Math.random()*uniq.length);
+        chosen.push(uniq.splice(idx,1)[0]);
+      }
+      box.innerHTML = chosen.map(w =>
+        `<div class="word-chip" onclick="setWord('${escapeHtmlAttr(w)}')">${escapeHtml(w)}</div>`
+      ).join("");
+    }
+
+    function validateVocabularyJson(data){
+      if(!Array.isArray(data)){
+        throw new Error("JSON 顶层必须是数组（Array）");
+      }
+      // 轻量校验：至少要有“词语”字段
+      const sample = data.find(x => x && typeof x === "object");
+      if(sample && !("词语" in sample)){
+        // 仍允许继续，但给提示
+        console.warn("提示：未检测到字段“词语”，请确认 JSON 字段是否为：级别/词语/拼音/词性 …");
+      }
+      return true;
+    }
+
+    function applyVocabulary(data, sourceLabel){
+      validateVocabularyJson(data);
+      rawList = data;
+      indexByWord = buildIndex(rawList);
+
+      document.getElementById("dbCount").textContent = String(rawList.length);
+      refreshSuggestions();
+
+      setDbStatus("ok", `词库加载成功（${sourceLabel}）`);
+    }
+
+    /***********************
+     * 2) 两种加载方式
+     *    A) 本地离线：FileReader
+     *    B) 在线同目录：fetch
+     ***********************/
+    async function tryFetchSameFolder(){
+      // 只要能 fetch 成功就用；失败就提示改用本地选择
+      setDbStatus("warn", "正在尝试自动读取同目录 JSON…");
+      try{
+        const resp = await fetch(DEFAULT_DB_URL, { cache: "no-store" });
+        if(!resp.ok) throw new Error("HTTP " + resp.status);
+        const data = await resp.json();
+        applyVocabulary(data, "自动读取/同目录");
+        setModeText("在线/自动读取（fetch）");
+        document.getElementById("hintText").textContent = "已通过自动读取加载词库，无需手动选择。";
+        localStorage.setItem("vocab_last_mode", "fetch_ok");
+        return true;
+      }catch(e){
+        console.warn(e);
+        setDbStatus("bad", "自动读取失败：如果你是本地双击打开，请改用“选择词汇2022.json”。");
+        setModeText("离线/本地选择");
+        localStorage.setItem("vocab_last_mode", "fetch_fail");
+        return false;
+      }
+    }
+
+    function pickLocalJsonFile(){
+      document.getElementById("fileInput").click();
+    }
+
+    function loadFromFile(file){
+      if(!file){
+        setDbStatus("bad", "未选择文件");
+        return;
+      }
+      if(!file.name.toLowerCase().endsWith(".json")){
+        setDbStatus("bad", "请选择 .json 文件");
+        return;
+      }
+      setDbStatus("warn", `正在读取：${file.name} …`);
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const text = reader.result;
+          const data = JSON.parse(text);
+          applyVocabulary(data, `本地选择/${file.name}`);
+          setModeText("离线/本地选择（FileReader）");
+          document.getElementById("hintText").textContent =
+            `已加载本地词库：${file.name}。现在可直接查询。`;
+
+          // 记住文件名（仅做提示；浏览器出于安全不允许自动再次读取文件内容）
+          localStorage.setItem("vocab_last_file_name", file.name);
+          localStorage.setItem("vocab_last_mode", "file_ok");
+        }catch(err){
+          console.error(err);
+          setDbStatus("bad", "解析失败：请确认 JSON 格式正确（UTF-8、合法 JSON 数组）。");
         }
-        
-        // 分析词汇
-        function analyzeWord() {
-            const word = document.getElementById("wordInput").value.trim();
-            const resultDiv = document.getElementById("result");
-            
-            if (!word) {
-                resultDiv.innerHTML = `<div class="unknown-result">请输入要分析的汉语词汇</div>`;
-                resultDiv.style.display = "block";
-                return;
-            }
-            
-            const wordInfo = vocabularyDB[word];
-            
-            if (wordInfo) {
-                let levelClass = "";
-                let hskLevel = "";
-                
-                switch(wordInfo.level) {
-                    case "初级":
-                        levelClass = "beginner";
-                        hskLevel = "HSK 1-3级";
-                        break;
-                    case "中级":
-                        levelClass = "intermediate";
-                        hskLevel = "HSK 4-5级";
-                        break;
-                    case "高级":
-                        levelClass = "advanced";
-                        hskLevel = "HSK 6级及以上";
-                        break;
-                }
-                
-                resultDiv.innerHTML = `
-                    <div class="word-header">
-                        <div class="word">${word}</div>
-                        <div class="level-badge ${levelClass}">${wordInfo.level} ${hskLevel}</div>
-                    </div>
-                    
-                    <div class="meaning">
-                        <strong>词义解释：</strong> ${wordInfo.meaning}
-                    </div>
-                    
-                    <div class="example">
-                        <strong>例句：</strong> ${wordInfo.example}
-                    </div>
-                    
-                    <div class="add-section">
-                        <h3>这个词汇分析对您有帮助吗？</h3>
-                        <p>您还可以添加新词到我们的数据库：</p>
-                        <div class="add-form">
-                            <input type="text" id="newWord" placeholder="输入新词">
-                            <select id="newWordLevel">
-                                <option value="初级">初级 (HSK 1-3)</option>
-                                <option value="中级">中级 (HSK 4-5)</option>
-                                <option value="高级">高级 (HSK 6+)</option>
-                            </select>
-                            <input type="text" id="newWordMeaning" placeholder="词义解释">
-                            <input type="text" id="newWordExample" placeholder="例句（可选）">
-                            <button onclick="addNewWord()">添加新词</button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                resultDiv.innerHTML = `
-                    <div class="unknown-result">
-                        <h3>未找到词汇 "${word}"</h3>
-                        <p>该词汇不在当前数据库中，您可以添加它：</p>
-                        <div class="add-form">
-                            <input type="text" id="newWord" placeholder="输入新词" value="${word}">
-                            <select id="newWordLevel">
-                                <option value="初级">初级 (HSK 1-3)</option>
-                                <option value="中级">中级 (HSK 4-5)</option>
-                                <option value="高级">高级 (HSK 6+)</option>
-                            </select>
-                            <input type="text" id="newWordMeaning" placeholder="词义解释">
-                            <input type="text" id="newWordExample" placeholder="例句（可选）">
-                            <button onclick="addNewWord()">添加新词</button>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            resultDiv.style.display = "block";
-            
-            // 滚动到结果区域
-            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        
-        // 添加新词
-        function addNewWord() {
-            const word = document.getElementById("newWord").value.trim();
-            const level = document.getElementById("newWordLevel").value;
-            const meaning = document.getElementById("newWordMeaning").value.trim();
-            const example = document.getElementById("newWordExample").value.trim();
-            
-            if (!word || !meaning) {
-                alert("请填写词汇和词义");
-                return;
-            }
-            
-            // 添加到数据库（在实际应用中，这里应该发送到服务器保存）
-            vocabularyDB[word] = {
-                level: level,
-                meaning: meaning,
-                example: example || "暂无例句"
-            };
-            
-            alert(`"${word}"已添加为${level}词汇！`);
-            
-            // 重新分析新添加的词
-            document.getElementById("wordInput").value = word;
-            analyzeWord();
-        }
-        
-        // 按Enter键分析
-        document.getElementById("wordInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                analyzeWord();
-            }
-        });
-        
-        // 初始化页面时显示一些提示
-        window.onload = function() {
-            document.getElementById("wordInput").focus();
-        };
-    </script>
+      };
+      reader.onerror = () => {
+        setDbStatus("bad", "读取失败：FileReader 出错");
+      };
+      reader.readAsText(file, "utf-8");
+    }
+
+    /***********************
+     * 3) 查询与展示
+     ***********************/
+    function setWord(word){
+      document.getElementById("wordInput").value = word;
+      analyzeWord();
+    }
+
+    function analyzeWord(){
+      const word = normalizeWord(document.getElementById("wordInput").value);
+      const resultDiv = document.getElementById("result");
+
+      if(!rawList.length){
+        resultDiv.innerHTML = `<div class="unknown-result"><h3>请先加载词库</h3><p>点击“选择词汇2022.json”（本地离线）或“自动读取（同目录）”（在线环境）。</p></div>`;
+        resultDiv.style.display = "block";
+        return;
+      }
+
+      if(!word){
+        resultDiv.innerHTML = `<div class="unknown-result"><h3>请输入要分析的词语</h3><p>例如：爱 / 阿姨 / 改革开放</p></div>`;
+        resultDiv.style.display = "block";
+        return;
+      }
+
+      const entries = mergeEntries(word);
+      if(entries.length){
+        const order = { "一级":1,"二级":2,"三级":3,"四级":4,"五级":5,"六级":6,"高等":7 };
+        entries.sort((a,b) => (order[a["级别"]]||99) - (order[b["级别"]]||99));
+
+        const primary = entries[0];
+        const lv = getLevelGroup(primary["级别"]);
+        const pinyin = primary["拼音"] ? primary["拼音"] : "（缺）";
+        const pos = primary["词性"] ? primary["词性"] : "（缺）";
+
+        const variants = entries.map((it, idx) => {
+          const lvl = it["级别"] || "（缺）";
+          const py = it["拼音"] || "（缺）";
+          const ps = it["词性"] || "（缺）";
+          return `
+            <div class="example">
+              <strong>条目 ${idx+1}</strong><br/>
+              <span>级别：${escapeHtml(lvl)} ｜ 拼音：${escapeHtml(py)} ｜ 词性：${escapeHtml(ps)}</span>
+            </div>
+          `;
+        }).join("");
+
+        resultDiv.innerHTML = `
+          <div class="word-header">
+            <div class="word">${escapeHtml(word)}</div>
+            <div class="level-badge ${lv.className}">${lv.group}（${escapeHtml(primary["级别"] || "未知")}）</div>
+          </div>
+
+          <div class="meaning">
+            <strong>等级判定：</strong>
+            ${escapeHtml(primary["级别"] || "未知")}（归类：${lv.group}｜区间：${lv.label}）
+          </div>
+
+          <div class="kv">
+            <div class="k">拼音</div><div class="v">${escapeHtml(pinyin)}</div>
+            <div class="k">词性</div><div class="v">${escapeHtml(pos)}</div>
+            <div class="k">同形条目</div><div class="v">${entries.length} 条（若存在不同拼音/词性/级别，将分别列出）</div>
+          </div>
+
+          ${variants}
+
+          <div class="add-section">
+            <h3>未找到该词？</h3>
+            <p class="muted">你可以在本页面临时添加（仅本机会话有效，不会写回 JSON）。</p>
+            <div class="add-form">
+              <input type="text" id="newWord" placeholder="词语" value="${escapeHtmlAttr(word)}">
+              <select id="newWordLevel">
+                <option value="一级">一级</option>
+                <option value="二级">二级</option>
+                <option value="三级">三级</option>
+                <option value="四级">四级</option>
+                <option value="五级">五级</option>
+                <option value="六级">六级</option>
+                <option value="高等">高等</option>
+              </select>
+              <input type="text" id="newWordPinyin" placeholder="拼音（如：āyí）">
+              <input type="text" id="newWordPOS" placeholder="词性（如：名/动/形…，可选）">
+              <button onclick="addNewWord()">添加（临时）</button>
+            </div>
+          </div>
+        `;
+      }else{
+        resultDiv.innerHTML = `
+          <div class="unknown-result">
+            <h3>未找到词语 “${escapeHtml(word)}”</h3>
+            <p>该词语不在当前词库中。可临时添加（仅本机会话有效）：</p>
+            <div class="add-form" style="margin-top: 12px;">
+              <input type="text" id="newWord" placeholder="词语" value="${escapeHtmlAttr(word)}">
+              <select id="newWordLevel">
+                <option value="一级">一级</option>
+                <option value="二级">二级</option>
+                <option value="三级">三级</option>
+                <option value="四级">四级</option>
+                <option value="五级">五级</option>
+                <option value="六级">六级</option>
+                <option value="高等">高等</option>
+              </select>
+              <input type="text" id="newWordPinyin" placeholder="拼音（如：gǎigékāifàng）">
+              <input type="text" id="newWordPOS" placeholder="词性（如：名/动/形…，可选）">
+              <button onclick="addNewWord()">添加（临时）</button>
+            </div>
+          </div>
+        `;
+      }
+
+      resultDiv.style.display = "block";
+      resultDiv.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function addNewWord(){
+      const w = normalizeWord(document.getElementById("newWord")?.value);
+      const lvl = normalizeWord(document.getElementById("newWordLevel")?.value);
+      const py = normalizeWord(document.getElementById("newWordPinyin")?.value);
+      const pos = normalizeWord(document.getElementById("newWordPOS")?.value);
+
+      if(!w || !lvl){
+        alert("请至少填写：词语 + 级别");
+        return;
+      }
+
+      const entry = { "No.": null, "级别": lvl, "词语": w, "拼音": py || "", "词性": pos || "" };
+      if(!userAdded.has(w)) userAdded.set(w, []);
+      userAdded.get(w).push(entry);
+
+      alert(`已临时添加：“${w}”（${lvl}）`);
+      document.getElementById("wordInput").value = w;
+      analyzeWord();
+    }
+
+    /***********************
+     * 4) 事件绑定与初始化
+     ***********************/
+    document.getElementById("wordInput").addEventListener("keypress", (e) => {
+      if(e.key === "Enter") analyzeWord();
+    });
+
+    document.getElementById("pickBtn").addEventListener("click", pickLocalJsonFile);
+    document.getElementById("fileInput").addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      loadFromFile(file);
+      // 允许再次选择同一文件时触发 change
+      e.target.value = "";
+    });
+
+    document.getElementById("tryFetchBtn").addEventListener("click", tryFetchSameFolder);
+
+    window.addEventListener("load", async () => {
+      document.getElementById("wordInput").focus();
+
+      // 如果是 file://，默认提示用户用“选择文件”
+      if(location.protocol === "file:"){
+        setDbStatus("warn", "本地模式：请点击“选择词汇2022.json”加载词库");
+        setModeText("离线/本地选择");
+        document.getElementById("hintText").textContent =
+          "你正在本地双击打开（file://）。请点击“选择词汇2022.json”，选择同文件夹里的 JSON 文件。";
+        return;
+      }
+
+      // http(s) 环境：先尝试自动读取，失败再提示手动选择
+      setModeText("在线/自动读取优先");
+      await tryFetchSameFolder();
+
+      const lastFileName = localStorage.getItem("vocab_last_file_name");
+      if(lastFileName && !rawList.length){
+        document.getElementById("hintText").textContent =
+          `提示：你上次加载过“${lastFileName}”。若自动读取失败，请点击“选择词汇2022.json”。`;
+      }
+    });
+  </script>
 </body>
 </html>
