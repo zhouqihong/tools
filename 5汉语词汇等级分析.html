@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>汉语词汇等级分析器（离线可用）</title>
+  <title>汉语词汇等级分析器（GitHub Pages）</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body{
@@ -31,13 +31,13 @@
       padding: 30px 20px;
       text-align: center;
     }
-    h1{ font-size: 2.3rem; margin-bottom: 10px; }
-    .subtitle{ font-size: 1.1rem; opacity: .95; max-width: 760px; margin: 0 auto; }
+    h1{ font-size: 2.25rem; margin-bottom: 10px; }
+    .subtitle{ font-size: 1.05rem; opacity: .95; max-width: 760px; margin: 0 auto; }
     .main-content{
       padding: 30px;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 18px;
     }
     .input-section{
       background: #f8f9fa;
@@ -67,10 +67,10 @@
       background: #3498db;
       color: #fff;
       border: none;
-      padding: 0 22px;
+      padding: 0 18px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 1.02rem;
+      font-size: 1.0rem;
       font-weight: 650;
       transition: all .2s ease;
       white-space: nowrap;
@@ -80,6 +80,7 @@
       transform: translateY(-1px);
       box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     }
+
     .levels-info{
       display:flex;
       gap:10px;
@@ -129,17 +130,19 @@
       flex-wrap:wrap;
       align-items:center;
     }
-    .file-btn{
-      background:#27ae60;
-    }
+    .file-btn{ background:#27ae60; }
     .file-btn:hover{ background:#1e8f4f; }
+    .ghost-btn{
+      background:#7f8c8d;
+    }
+    .ghost-btn:hover{ background:#667172; }
+
     .small{
       font-size:.9rem;
       color:#556;
       text-align:center;
       margin-top:8px;
     }
-    .hidden{ display:none !important; }
 
     #result{
       background:#fff;
@@ -164,7 +167,7 @@
       flex-wrap:wrap;
     }
     .word{
-      font-size: 2.1rem;
+      font-size: 2.05rem;
       font-weight: 750;
       color:#2c3e50;
     }
@@ -179,7 +182,7 @@
     .advanced{ background:#f44336; color:#fff; }
 
     .meaning{
-      font-size: 1.08rem;
+      font-size: 1.05rem;
       margin-bottom: 10px;
       line-height: 1.8;
     }
@@ -205,32 +208,6 @@
     .unknown-result h3{ margin-bottom:8px; color:#2c3e50; }
     .unknown-result p{ color:#556; }
 
-    .add-section{
-      margin-top: 22px;
-      padding-top: 18px;
-      border-top: 1px dashed #ddd;
-    }
-    .add-section h3{ margin-bottom:10px; color:#2c3e50; }
-    .muted{ color:#60748a; font-size:.95rem; }
-    .add-form{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    .add-form input, .add-form select{
-      padding: 12px;
-      border: 2px solid #e1e5eb;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-    .add-form button{
-      grid-column: span 2;
-      padding: 12px;
-      background:#8e44ad;
-    }
-    .add-form button:hover{ background:#6d2f86; }
-
     .suggestions h3{ margin-bottom: 12px; color:#2c3e50; }
     .suggested-words{ display:flex; flex-wrap:wrap; gap:10px; }
     .word-chip{
@@ -246,23 +223,6 @@
       transform: translateY(-1px);
     }
 
-    .level-description{
-      background:#f8f9fa;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    .level-description h3{ margin-bottom: 12px; color:#2c3e50; }
-    .level-info{ display:flex; gap: 15px; margin-top: 15px; }
-    .level-box{
-      flex:1;
-      padding: 15px;
-      border-radius: 8px;
-      color:#fff;
-    }
-    .beginner-box{ background: linear-gradient(to right, #4caf50, #81c784); }
-    .intermediate-box{ background: linear-gradient(to right, #ffc107, #ffd54f); color:#333; }
-    .advanced-box{ background: linear-gradient(to right, #f44336, #ef5350); }
-
     footer{
       text-align:center;
       padding: 20px;
@@ -271,14 +231,14 @@
       font-size: .9rem;
     }
 
+    code.inline{ background:#f0f3f6; padding:2px 6px; border-radius:6px; }
+
     @media (max-width:768px){
       .input-group{ flex-direction:column; }
       button{ width:100%; padding: 14px; }
-      .add-form{ grid-template-columns: 1fr; }
-      .add-form button{ grid-column: span 1; }
-      .level-info{ flex-direction:column; }
       .kv{ grid-template-columns: 90px 1fr; }
     }
+    .hidden{ display:none !important; }
   </style>
 </head>
 
@@ -287,7 +247,7 @@
     <header>
       <h1>汉语词汇等级分析器</h1>
       <p class="subtitle">
-        本工具支持离线使用：本地双击打开也能加载 <b>词汇2022.json</b>（选择文件即可），并查询“级别/拼音/词性”等信息。
+        GitHub Pages 上会自动读取同目录 <b>词汇2022.json</b>；若读取失败，可手动选择 JSON 文件作为兜底。
       </p>
     </header>
 
@@ -307,25 +267,23 @@
         <div id="statusBar">
           <div class="pill">
             <span class="dot warn" id="dbDot"></span>
-            <span id="dbStatusText">尚未加载词库</span>
+            <span id="dbStatusText">正在初始化…</span>
           </div>
           <div class="pill">
             <span>词条数：<b id="dbCount">-</b></span>
           </div>
           <div class="pill">
-            <span>模式：<b id="modeText">离线/本地选择</b></span>
+            <span>路径：<b id="pathText">./词汇2022.json</b></span>
           </div>
         </div>
 
         <div class="loader-row">
-          <button class="file-btn" id="pickBtn" type="button">选择词汇2022.json</button>
-          <button id="tryFetchBtn" type="button" title="在 GitHub Pages 等 http(s) 环境下可自动读取同目录 JSON">自动读取（同目录）</button>
+          <button class="file-btn" id="pickBtn" type="button">选择词汇2022.json（兜底）</button>
+          <button class="ghost-btn" id="retryBtn" type="button">重新自动读取</button>
           <input class="hidden" id="fileInput" type="file" accept=".json,application/json" />
         </div>
 
-        <div class="small" id="hintText">
-          本地双击打开时，请点击“选择词汇2022.json”，并在弹窗中选择同文件夹里的 JSON 文件。
-        </div>
+        <div class="small" id="hintText"></div>
       </div>
 
       <div id="result"></div>
@@ -339,47 +297,24 @@
           <div class="word-chip" onclick="setWord('改革开放')">改革开放</div>
         </div>
       </div>
-
-      <div class="level-description">
-        <h3>等级说明</h3>
-        <div class="level-info">
-          <div class="level-box beginner-box">
-            <h4>初级（一级–三级）</h4>
-            <p>满足日常基本交流需求，覆盖高频生活、学习、校园、出行等场景。</p>
-          </div>
-          <div class="level-box intermediate-box">
-            <h4>中级（四级–五级）</h4>
-            <p>可较流利地表达观点、理解较复杂语段，适用于学习与工作交流。</p>
-          </div>
-          <div class="level-box advanced-box">
-            <h4>高级（六级–高等）</h4>
-            <p>覆盖抽象与专业表达，可处理复杂语境与较高难度文本。</p>
-          </div>
-        </div>
-      </div>
     </div>
 
     <footer>
-      <p>汉语词汇等级分析器 &copy; 2026 | 支持离线（FileReader）与在线（fetch）双模式</p>
+      <p>汉语词汇等级分析器 &copy; 2026 | GitHub Pages 自动加载 + 手动选择兜底</p>
     </footer>
   </div>
 
   <script>
     /***********************
-     * 0) 全局变量
+     * 配置：如果你把 json 放在别的目录，只改这一行
      ***********************/
-    const DEFAULT_DB_NAME = "词汇2022.json";
-    const DEFAULT_DB_URL = "./" + DEFAULT_DB_NAME;
+    const DB_URL = "./词汇2022.json"; // 同目录部署（推荐） :contentReference[oaicite:1]{index=1}
 
-    let rawList = [];            // 原始数组
-    let indexByWord = new Map(); // 词语 -> entries[]
-    let userAdded = new Map();   // 会话内临时添加
+    let rawList = [];
+    let indexByWord = new Map();
+    let userAdded = new Map();
 
-    /***********************
-     * 1) 工具函数
-     ***********************/
     function normalizeWord(s){ return (s || "").trim(); }
-
     function escapeHtml(s){
       return String(s ?? "")
         .replace(/&/g,"&amp;")
@@ -395,10 +330,6 @@
       dot.classList.remove("ok","warn","bad");
       dot.classList.add(type);
       document.getElementById("dbStatusText").textContent = text;
-    }
-
-    function setModeText(s){
-      document.getElementById("modeText").textContent = s;
     }
 
     function buildIndex(list){
@@ -437,7 +368,6 @@
       const uniq = Array.from(new Set(
         rawList.map(r => normalizeWord(r["词语"])).filter(Boolean)
       ));
-
       const chosen = [];
       const n = Math.min(10, uniq.length);
       for(let i=0;i<n;i++){
@@ -453,12 +383,6 @@
       if(!Array.isArray(data)){
         throw new Error("JSON 顶层必须是数组（Array）");
       }
-      // 轻量校验：至少要有“词语”字段
-      const sample = data.find(x => x && typeof x === "object");
-      if(sample && !("词语" in sample)){
-        // 仍允许继续，但给提示
-        console.warn("提示：未检测到字段“词语”，请确认 JSON 字段是否为：级别/词语/拼音/词性 …");
-      }
       return true;
     }
 
@@ -471,30 +395,34 @@
       refreshSuggestions();
 
       setDbStatus("ok", `词库加载成功（${sourceLabel}）`);
+      document.getElementById("hintText").textContent = "";
     }
 
-    /***********************
-     * 2) 两种加载方式
-     *    A) 本地离线：FileReader
-     *    B) 在线同目录：fetch
-     ***********************/
-    async function tryFetchSameFolder(){
-      // 只要能 fetch 成功就用；失败就提示改用本地选择
-      setDbStatus("warn", "正在尝试自动读取同目录 JSON…");
+    async function loadByFetch(){
+      document.getElementById("pathText").textContent = DB_URL;
+      if(location.protocol === "file:"){
+        setDbStatus("bad", "检测到 file://：自动读取被浏览器限制。请用“选择 JSON”按钮。");
+        document.getElementById("hintText").innerHTML =
+          `你在本地双击打开（<code class="inline">file://</code>）。浏览器禁止 fetch 本地文件。请点击上方 <b>选择词汇2022.json（兜底）</b>。`;
+        return false;
+      }
+
+      setDbStatus("warn", "正在自动读取同目录 JSON…");
       try{
-        const resp = await fetch(DEFAULT_DB_URL, { cache: "no-store" });
+        const resp = await fetch(DB_URL, { cache:"no-store" });
         if(!resp.ok) throw new Error("HTTP " + resp.status);
         const data = await resp.json();
-        applyVocabulary(data, "自动读取/同目录");
-        setModeText("在线/自动读取（fetch）");
-        document.getElementById("hintText").textContent = "已通过自动读取加载词库，无需手动选择。";
-        localStorage.setItem("vocab_last_mode", "fetch_ok");
+        applyVocabulary(data, "自动读取（fetch）");
         return true;
       }catch(e){
         console.warn(e);
-        setDbStatus("bad", "自动读取失败：如果你是本地双击打开，请改用“选择词汇2022.json”。");
-        setModeText("离线/本地选择");
-        localStorage.setItem("vocab_last_mode", "fetch_fail");
+        setDbStatus("bad", "自动读取失败：请检查 GitHub Pages 部署路径/文件名，或用“选择 JSON”兜底。");
+        document.getElementById("hintText").innerHTML =
+          `自动读取失败（常见原因）：<br>
+           1）仓库里没有放 <code class="inline">词汇2022.json</code> 或不在同目录；<br>
+           2）文件名大小写/空格不一致；<br>
+           3）GitHub Pages 指向的分支/目录不是你放文件的目录。<br>
+           你可以先点击 <b>选择词汇2022.json（兜底）</b> 验证页面功能。`;
         return false;
       }
     }
@@ -512,35 +440,22 @@
         setDbStatus("bad", "请选择 .json 文件");
         return;
       }
-      setDbStatus("warn", `正在读取：${file.name} …`);
+      setDbStatus("warn", `正在读取本地：${file.name} …`);
 
       const reader = new FileReader();
       reader.onload = () => {
         try{
-          const text = reader.result;
-          const data = JSON.parse(text);
+          const data = JSON.parse(reader.result);
           applyVocabulary(data, `本地选择/${file.name}`);
-          setModeText("离线/本地选择（FileReader）");
-          document.getElementById("hintText").textContent =
-            `已加载本地词库：${file.name}。现在可直接查询。`;
-
-          // 记住文件名（仅做提示；浏览器出于安全不允许自动再次读取文件内容）
-          localStorage.setItem("vocab_last_file_name", file.name);
-          localStorage.setItem("vocab_last_mode", "file_ok");
         }catch(err){
           console.error(err);
-          setDbStatus("bad", "解析失败：请确认 JSON 格式正确（UTF-8、合法 JSON 数组）。");
+          setDbStatus("bad", "解析失败：请确认 JSON 是合法数组格式（UTF-8，合法 JSON）。");
         }
       };
-      reader.onerror = () => {
-        setDbStatus("bad", "读取失败：FileReader 出错");
-      };
+      reader.onerror = () => setDbStatus("bad", "读取失败：FileReader 出错");
       reader.readAsText(file, "utf-8");
     }
 
-    /***********************
-     * 3) 查询与展示
-     ***********************/
     function setWord(word){
       document.getElementById("wordInput").value = word;
       analyzeWord();
@@ -551,11 +466,10 @@
       const resultDiv = document.getElementById("result");
 
       if(!rawList.length){
-        resultDiv.innerHTML = `<div class="unknown-result"><h3>请先加载词库</h3><p>点击“选择词汇2022.json”（本地离线）或“自动读取（同目录）”（在线环境）。</p></div>`;
+        resultDiv.innerHTML = `<div class="unknown-result"><h3>请先加载词库</h3><p>GitHub Pages 会自动读取同目录 JSON；若失败请点击“选择词汇2022.json（兜底）”。</p></div>`;
         resultDiv.style.display = "block";
         return;
       }
-
       if(!word){
         resultDiv.innerHTML = `<div class="unknown-result"><h3>请输入要分析的词语</h3><p>例如：爱 / 阿姨 / 改革开放</p></div>`;
         resultDiv.style.display = "block";
@@ -563,6 +477,7 @@
       }
 
       const entries = mergeEntries(word);
+
       if(entries.length){
         const order = { "一级":1,"二级":2,"三级":3,"四级":4,"五级":5,"六级":6,"高等":7 };
         entries.sort((a,b) => (order[a["级别"]]||99) - (order[b["级别"]]||99));
@@ -602,47 +517,12 @@
           </div>
 
           ${variants}
-
-          <div class="add-section">
-            <h3>未找到该词？</h3>
-            <p class="muted">你可以在本页面临时添加（仅本机会话有效，不会写回 JSON）。</p>
-            <div class="add-form">
-              <input type="text" id="newWord" placeholder="词语" value="${escapeHtmlAttr(word)}">
-              <select id="newWordLevel">
-                <option value="一级">一级</option>
-                <option value="二级">二级</option>
-                <option value="三级">三级</option>
-                <option value="四级">四级</option>
-                <option value="五级">五级</option>
-                <option value="六级">六级</option>
-                <option value="高等">高等</option>
-              </select>
-              <input type="text" id="newWordPinyin" placeholder="拼音（如：āyí）">
-              <input type="text" id="newWordPOS" placeholder="词性（如：名/动/形…，可选）">
-              <button onclick="addNewWord()">添加（临时）</button>
-            </div>
-          </div>
         `;
       }else{
         resultDiv.innerHTML = `
           <div class="unknown-result">
             <h3>未找到词语 “${escapeHtml(word)}”</h3>
-            <p>该词语不在当前词库中。可临时添加（仅本机会话有效）：</p>
-            <div class="add-form" style="margin-top: 12px;">
-              <input type="text" id="newWord" placeholder="词语" value="${escapeHtmlAttr(word)}">
-              <select id="newWordLevel">
-                <option value="一级">一级</option>
-                <option value="二级">二级</option>
-                <option value="三级">三级</option>
-                <option value="四级">四级</option>
-                <option value="五级">五级</option>
-                <option value="六级">六级</option>
-                <option value="高等">高等</option>
-              </select>
-              <input type="text" id="newWordPinyin" placeholder="拼音（如：gǎigékāifàng）">
-              <input type="text" id="newWordPOS" placeholder="词性（如：名/动/形…，可选）">
-              <button onclick="addNewWord()">添加（临时）</button>
-            </div>
+            <p>该词语不在当前词库中（或输入含空格/符号）。请尝试更精确的词语形式。</p>
           </div>
         `;
       }
@@ -651,29 +531,6 @@
       resultDiv.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    function addNewWord(){
-      const w = normalizeWord(document.getElementById("newWord")?.value);
-      const lvl = normalizeWord(document.getElementById("newWordLevel")?.value);
-      const py = normalizeWord(document.getElementById("newWordPinyin")?.value);
-      const pos = normalizeWord(document.getElementById("newWordPOS")?.value);
-
-      if(!w || !lvl){
-        alert("请至少填写：词语 + 级别");
-        return;
-      }
-
-      const entry = { "No.": null, "级别": lvl, "词语": w, "拼音": py || "", "词性": pos || "" };
-      if(!userAdded.has(w)) userAdded.set(w, []);
-      userAdded.get(w).push(entry);
-
-      alert(`已临时添加：“${w}”（${lvl}）`);
-      document.getElementById("wordInput").value = w;
-      analyzeWord();
-    }
-
-    /***********************
-     * 4) 事件绑定与初始化
-     ***********************/
     document.getElementById("wordInput").addEventListener("keypress", (e) => {
       if(e.key === "Enter") analyzeWord();
     });
@@ -682,33 +539,15 @@
     document.getElementById("fileInput").addEventListener("change", (e) => {
       const file = e.target.files && e.target.files[0];
       loadFromFile(file);
-      // 允许再次选择同一文件时触发 change
       e.target.value = "";
     });
 
-    document.getElementById("tryFetchBtn").addEventListener("click", tryFetchSameFolder);
+    document.getElementById("retryBtn").addEventListener("click", loadByFetch);
 
     window.addEventListener("load", async () => {
+      setDbStatus("warn", "正在自动读取词库…");
+      await loadByFetch();
       document.getElementById("wordInput").focus();
-
-      // 如果是 file://，默认提示用户用“选择文件”
-      if(location.protocol === "file:"){
-        setDbStatus("warn", "本地模式：请点击“选择词汇2022.json”加载词库");
-        setModeText("离线/本地选择");
-        document.getElementById("hintText").textContent =
-          "你正在本地双击打开（file://）。请点击“选择词汇2022.json”，选择同文件夹里的 JSON 文件。";
-        return;
-      }
-
-      // http(s) 环境：先尝试自动读取，失败再提示手动选择
-      setModeText("在线/自动读取优先");
-      await tryFetchSameFolder();
-
-      const lastFileName = localStorage.getItem("vocab_last_file_name");
-      if(lastFileName && !rawList.length){
-        document.getElementById("hintText").textContent =
-          `提示：你上次加载过“${lastFileName}”。若自动读取失败，请点击“选择词汇2022.json”。`;
-      }
     });
   </script>
 </body>
